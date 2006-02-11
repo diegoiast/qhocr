@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+	<qresource>
+		<file>src/default.html</file>
+		<file>src/images/copy.png</file>
+		<file>src/images/cut.png</file>
+		<file>src/images/new.png</file>
+		<file>src/images/open.png</file>
+		<file>src/images/paste.png</file>
+		<file>src/images/save.png</file>
+		<file>src/images/zoomin.png</file>
+		<file>src/images/zoomout.png</file>
+	</qresource>
+</RCC>

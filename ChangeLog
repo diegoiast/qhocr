@@ -1,0 +1,26 @@
+qhocr (0.5.0)
+  * New HOCR library, pulled out of SVN 24-sep-2005, V0.5
+  * Many regressions reguarding the OCR ;-)
+  * New configuration dialog
+  * Changed zoom step from 1.25 to 1.1
+  -- Diego Iastrubni <elcuco@kde.org>	Sat, 24 Sep 21:00
+
+qhocr (0.47)
+  * New widget for displaying images (new feature, "best fit")
+  * Link to non debug version (works out of the box on win32)
+  * Improoved compilation batch on win32
+  * Save status on exit, restore on load
+  * Added "About Qt"
+  -- Diego Iastrubni <elcuco@kde.org>	Sat, 24 Sep 21:00
+
+qhocr (0.46)
+  * Stand alone version (no longer part of HOCR project)
+  * Design GUI
+  * Zoom in/Zoom out actions availavle for image
+  * Linking staticly HOCR 0.45, on all platforms
+  -- Diego Iastrubni <elcuco@kde.org>	Sat, 27 Aug 21:00
+
+qhocr (0.01)
+  * First release, tested on win32
+  * Minimalist GUI
+  -- Diego Iastrubni <elcuco@kde.org>	Fri, 19 Aug 02:00

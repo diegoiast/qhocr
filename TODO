@@ -1,0 +1,45 @@
+0.47
+bugs
+ 1) save and loading of fonts is not perfect (saves familiy, not size+wieght)
+ 2) hocr still crashes at a lot of images
+ 3) MainWindow::loadStatus problems with loading saved infor into image viewer
+ 4) mac port
+ 5) need to write a manual to application usage
+  
+whishes
+ 1) doxygen documentation needed
+ 2) drag image with mouse
+ 3) different icons on win32/linux/mac
+ 4) need icon/about-image for the application
+
+0.46
+bugs
+ 1) miscompilations on win32 QT 4.0.1, reported to the trolls.
+    fixed. need to run "configure" at the Qt 4.0.1 cmd window,
+	and then will only compile with "release"
+ 2) fix crashes on libhocr
+    yea right... 
+ 3) mac port
+    not in the near future
+ 4) need to write code documentation (doxygen)   
+	work in progress
+ 5) need a manual for the application
+    not in the near future
+ 
+wishes 
+ 1) need to update libhocr to newer version
+    soon :)
+ 2) make libhocr a DLL on windows, and on unix link aginst the SO 
+    (will not happen, hocr is not keeping BC, and thus not smart)
+ 3) need to save status of application on exit (dock window, fonts, file loaded)
+    done, problems with fonts
+ 4) need to load status of application on run
+    done, problems with fonts
+ 5) adjust image size upon window resize
+    done, "autofit" by new image viewer
+ 6) move image with mouse (drag the image to scroll)
+    soon :)
+ 7) ctrl+wheel to zoom-in/zoom-out 
+    done, new image viewer
+ 8) different icons on win32/linux/mac
+ 9) need icon for the application
