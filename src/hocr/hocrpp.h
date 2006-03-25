@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *            hocrpp.h
  *
@@ -26,9 +27,10 @@
 #define __HOCR_PP_H__
 
 #include <hocr.h>
-#include <string.h>
+#include <hocr_textbuffer.h>
+#include <hocr_pixbuf.h>
 
-#include <string>
+#include <string.h>
 
 /**
  @brief the libhocr namespace.
@@ -44,107 +46,6 @@ namespace hocr
 	class Hocr;
 
 	/**
-	 @brief HocrFormatStrings class.
-	
-	 class for Hebrew OCR format strings
-	 */
-	class HocrFormatStrings;
-
-		/**
-	 @brief HocrFormatStrings class.
-	
-	 class for Hebrew OCR format strings
-	 */
-	class HocrFormatStrings
-	{
-	      public:
-
-		/**
-		 @brief HocrFormatStrings constructor.
-		 */
-		HocrFormatStrings ()
-		{
-			strcpy (format_strings.page_start_string, "");
-			strcpy (format_strings.page_end_string, "");
-			strcpy (format_strings.column_start_string, "");
-			strcpy (format_strings.column_end_string, "");
-			strcpy (format_strings.paragraph_start_string, "");
-			strcpy (format_strings.paragraph_end_string, "");
-			strcpy (format_strings.line_start_string, "");
-			strcpy (format_strings.line_end_string, "");
-			strcpy (format_strings.unknown_start_string, "");
-			strcpy (format_strings.unknown_end_string, "");
-		}
-
-		/**
-		 @brief HocrFormatStrings destructor.
-		 */
-		 ~HocrFormatStrings ()
-		{
-			// do nothing ?
-		}
-
-		void set_page_start_string (char *str)
-		{
-			strcpy (format_strings.page_start_string, str);
-		}
-
-		void set_page_end_string (char *str)
-		{
-			strcpy (format_strings.page_end_string, str);
-		}
-
-		void set_column_start_string (char *str)
-		{
-			strcpy (format_strings.column_start_string, str);
-		}
-
-		void set_column_end_string (char *str)
-		{
-			strcpy (format_strings.column_end_string, str);
-		}
-
-		void set_paragraph_start_string (char *str)
-		{
-			strcpy (format_strings.paragraph_start_string, str);
-		}
-
-		void set_paragraph_end_string (char *str)
-		{
-			strcpy (format_strings.paragraph_end_string, str);
-		}
-
-		void set_line_start_string (char *str)
-		{
-			strcpy (format_strings.line_start_string, str);
-		}
-
-		void set_line_end_string (char *str)
-		{
-			strcpy (format_strings.line_end_string, str);
-		}
-
-		void set_unknown_start_string (char *str)
-		{
-			strcpy (format_strings.unknown_start_string, str);
-		}
-
-		void set_unknown_end_string (char *str)
-		{
-			strcpy (format_strings.unknown_end_string, str);
-		}
-
-		hocr_format_strings get_format_strings ()
-		{
-			return format_strings;
-		}
-
-	      private:
-
-		hocr_format_strings format_strings;
-	};
-
-	/**
 	 @brief Hocr class.
 	
 	 class for Hebrew OCR
@@ -152,15 +53,15 @@ namespace hocr
 	class Hocr
 	{
 	      public:
-		////////////////////////////////////////
-		////////////////////////////////////////
+		// //////////////////////////////////////
+		// //////////////////////////////////////
 
 		/**
 		 @brief Hocr constructor.
 		 */
 		Hocr ()
 		{
-			h = (hocr_pixbuf *) malloc (sizeof (hocr_pixbuf));
+			h = hocr_pixbuf_new ();	/* get an empty hocr_pix */
 
 			h->n_channels = 3;
 			h->brightness = 100;
@@ -168,6 +69,15 @@ namespace hocr
 			h->width = 0;
 			h->height = 0;
 			h->rowstride = 0;
+
+			/* no text yet */
+			t = (hocr_text_buffer *) 0;
+
+			/* init ocr options */
+			opt_d = 1;
+			opt_n = 1;
+			opt_s = 0;
+			opt_t = 0;
 		}
 
 		/**
@@ -178,50 +88,70 @@ namespace hocr
 		Hocr (const char *filename)
 		{
 			h = hocr_pixbuf_new_from_file (filename);
+
+			/* no text yet */
+			t = (hocr_text_buffer *) 0;
+
+			/* init ocr options */
+			opt_d = 1;
+			opt_n = 1;
+			opt_s = 0;
+			opt_t = 0;
 		}
 
 		/**
 		 @brief Hocr destructor.
 		 */
-		~Hocr ()
+		 ~Hocr ()
 		{
 			hocr_pixbuf_unref (h);
+
+			if (t)
+				hocr_text_buffer_unref (t);
 		}
 
 		/**
 		 @brief do ocr on a hocr_pixbuf and return the result text to text_buffer
-
-		 @param text a string to get the output text in.
-		 @return 1
+  		 @return a pointer to the internal char* array
 		 */
-		int do_ocr (std::string *text,
-			    HocrFormatStrings foramt_strings)
+		char *do_ocr ()
 		{
-			hocr_text_buffer *text_buffer = 0;
+			h->command = HOCR_COMMAND_OCR;
+
+			/* use dict ? */
+			if (opt_d)
+				h->command |= HOCR_COMMAND_DICT;
+
+			/* use nikud ? */
+			if (opt_n)
+				h->command |= HOCR_COMMAND_NIKUD;
+
+			/* use spaces ? */
+			if (opt_s)
+				h->command |= HOCR_COMMAND_USE_SPACE_FOR_TAB;
+
+			/* use indentation ? */
+			if (opt_t)
+				h->command |= HOCR_COMMAND_USE_INDENTATION;
+
+			/* if text exist free it */
+			if (t)
+				hocr_text_buffer_unref (t);
+			t = (hocr_text_buffer *) 0;
 
 			/* create text buffer */
-			text_buffer = hocr_text_buffer_new ();
+			t = hocr_text_buffer_new ();
 
-			if (!text_buffer)
-			{
-				return 0;
-			}
+			/* do hocr */
+			h->progress = 0;
+			h->progress_phase = 0;
+			hocr_do_ocr (h, t);
 
-			hocr_do_ocr (h, text_buffer,
-				     &(foramt_strings.get_format_strings ()),
-				     (hocr_output)(HOCR_OUTPUT_WITH_GRAPHICS),
-				     (hocr_ocr_type)(HOCR_OCR_TYPE_COLUMNS |
-				     HOCR_OCR_TYPE_NIKUD), 0);
-
-			*text = text_buffer->text;
-
-			hocr_text_buffer_unref (text_buffer);
-
-			return 1;
+			return t->text;
 		}
 
-		////////////////////////////////////////
-		////////////////////////////////////////
+		// //////////////////////////////////////
+		// //////////////////////////////////////
 
 		/**
 		 @brief get number of channels
@@ -262,6 +192,7 @@ namespace hocr
 		{
 			return hocr_pixbuf_get_rowstride (h);
 		}
+
 		/**
 		 @brief get value from which a gray-scale pixel is considered white
 		
@@ -277,13 +208,13 @@ namespace hocr
 		
 		 @return pointer to raw pixpuf data
 		 */
-		unsigned char *get_pixels ()
+		char *get_pixels ()
 		{
-			return hocr_pixbuf_get_pixels (h);
+			return (char *) (hocr_pixbuf_get_pixels (h));
 		}
 
-		//////////////////////////////////////////////
-		//////////////////////////////////////////////
+		// ////////////////////////////////////////////
+		// ////////////////////////////////////////////
 
 		/**
 		 @brief set number of channels
@@ -332,6 +263,7 @@ namespace hocr
 
 			return n;
 		}
+
 		/**
 		 @brief set value from which a gray-scale pixel is considered white
 		
@@ -353,15 +285,33 @@ namespace hocr
 		
 		 @return pointer to raw pixpuf data
 		 */
-		unsigned char *set_pixels (unsigned char *p)
+		char *set_pixels (char *p)
 		{
-			h->pixels = p;
+			h->pixels = (unsigned char *) p;
 
 			return p;
 		}
 
-		//////////////////////////////////////////////
-		//////////////////////////////////////////////
+		/**
+		 @brief copy raw pixpuf data
+			
+		 @return pointer to raw pixpuf data
+		 */
+		char *copy_pixels (char *p, int length)
+		{
+			int i;
+
+			h->pixels = (unsigned char *) malloc (length);
+			if (!(h->pixels))
+				return NULL;
+
+			memcpy (h->pixels, p, length);
+
+			return (char *) (h->pixels);
+		}
+
+		// ////////////////////////////////////////////
+		// ////////////////////////////////////////////
 
 		/**
 		 @brief get color of pixel
@@ -386,16 +336,68 @@ namespace hocr
 		 */
 		int set_pixel (int x, int y, int channel, int value)
 		{
-			return hocr_pixbuf_set_pixel (h, x, y, channel,
-						      value);
+			return hocr_pixbuf_set_pixel (h, x, y, channel, value);
 		}
 
-		////////////////////////////////////////
-		////////////////////////////////////////
+		// //////////////////////////////////////
+		// //////////////////////////////////////
+
+		/**
+		 @brief set internal dictionary option
+		
+		 @param opt_d the value of the option
+		 @return the option set
+		 */
+		int set_opt_d (int opt_d)
+		{
+			return (this->opt_d = opt_d);
+		}
+
+		/**
+		 @brief set guess nikud option
+		
+		 @param opt_n the value of the option
+		 @return the option set
+		 */
+		int set_opt_n (int opt_n)
+		{
+			return (this->opt_n = opt_n);
+		}
+
+		/**
+		 @brief set use spaces for tabs option
+		
+		 @param opt_s the value of the option
+		 @return the option set
+		 */
+		int set_opt_s (int opt_s)
+		{
+			return (this->opt_s = opt_s);
+		}
+
+		/**
+		 @brief set indent indented lines option
+		
+		 @param opt_t the value of the option
+		 @return the option set
+		 */
+		int set_opt_t (int opt_t)
+		{
+			return (this->opt_t = opt_t);
+		}
+
+		// //////////////////////////////////////
+		// //////////////////////////////////////
 
 	      private:
 
 		hocr_pixbuf * h;
+		hocr_text_buffer *t;
+
+		int opt_d;
+		int opt_n;
+		int opt_s;
+		int opt_t;
 
 	};
 

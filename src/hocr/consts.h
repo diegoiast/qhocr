@@ -34,14 +34,16 @@
 #define FALSE 0
 #endif
 
+// #define DEBUG
+
 /* FIXME: this is a hack for normal pages 
    no more then 200 lines and 200 fonts per line
    better to use dynamic aloocation */
 
 /* in units */
-#define MAX_COLUMNS 2
-#define MAX_LINES 50
-#define MAX_FONTS_IN_LINE 50
+#define MAX_COLUMNS 4
+#define MAX_LINES 200
+#define MAX_FONTS_IN_LINE 200
 
 /* FIXME: this values are good for some book lauouts with 
    serif fonts using 300 dots per inch lineart scan
@@ -51,6 +53,12 @@
 #define NORMAL_FONT_WIDTH 20
 #define NORMAL_FONT_HIGHT 30
 
+#define MIN_FONT_WEIGHT 4
+#define MAX_FONT_WEIGHT 1200
+
+#define MAX_FONT_WIDTH 100
+#define MAX_FONT_HIGHT 100
+	
 #define MAX_LINE_HIGHT 50
 #define MIN_LINE_HIGHT 20
 
@@ -61,7 +69,7 @@
 #define MIN_DISTANCE_BETWEEN_FONTS 3
 
 /* in 1/1000 cover units */
-#define NOT_IN_A_LINE 33
+#define NOT_IN_A_LINE 2
 #define IN_A_LINE 62
 
 #define NOT_IN_A_FONT 30
@@ -82,9 +90,6 @@
 
 /* used in font_layout.c to calculate line equation */
 #define NUM_OF_FONTS_TO_AVG 2
-
-/* how much memory will hocr_text_buffer will allocate when it nead memory */
-#define MEMORY_CHANK_FOR_TEXT_BUFFER 500
 
 /* indentation */
 #define NUM_OF_FONTS_IN_INDENT 3

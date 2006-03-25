@@ -28,63 +28,120 @@
 #ifndef __HOCR_PIXBUF_H__
 #define __HOCR_PIXBUF_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /** line equation structore used by hocr
  
  a and b in the equation are Y = a X + b
+ y = a1 x + b1 | x < X1
+ y = a2 x + b2 | x < X2 ...
  */
-typedef struct
-{
-	double a;
-	double b;
-} hocr_line_eq;
+	typedef struct
+	{
+		int x1;
+		double a1;
+		double b1;
+		int x2;
+		double a2;
+		double b2;
+		int x3;
+		double a3;
+		double b3;
+		int x4;
+		double a4;
+		double b4;
+	} hocr_line_eq;
 
-typedef struct
-{
-	int x1;
-	int y1;
-	int x2;
-	int y2;
-	int hight;
-	int width;
-} hocr_box;
+	typedef struct
+	{
+		int x1;
+		int y1;
+		int x2;
+		int y2;
+		int hight;
+		int width;
+	} hocr_box;
 
 /** pixbuf structore used by hocr
 
 */
-typedef struct
-{
+	typedef struct
+	{
 
 	/** number of color channels in the pixpuf (e.g. 3 for red,green,blue). */
-	int n_channels;
+		int n_channels;
 
 	/** get height in pixels. */
-	int height;
+		int height;
 
 	/** get width in pixels. */
-	int width;
+		int width;
 
 	/** get number of bytes in a raw of pixels. */
-	int rowstride;
+		int rowstride;
 
 	/** value from which a gray-scale pixel is considered white. */
-	int brightness;
+		int brightness;
 
 	/** raw pixpuf data. */
-	unsigned char *pixels;
+		unsigned char *pixels;
 
 	/** raw object map */
-	unsigned int *object_map;
+		unsigned int *object_map;
 
 	/** objects list */
-	hocr_object *objects;
-	/* number of objects found */
-	int num_of_objects;
+		hocr_object *objects;
 
-	/* I/O members */
-	unsigned char command;
-	unsigned char error;
+	/** number of objects found */
+		unsigned int num_of_objects;
+		
+	/** number of the maximum object found */
+		unsigned int num_of_max_object;
+		
+	/** number of letters found */
+		int num_of_letters;
+	
+	/** number of missread letters found */
+		int num_of_missread_letters;
+		
+	/** number of words found */
+		int num_of_words;
+		
+	/** number of misspelled words found */
+		int num_of_misspled_words;
+	
+	/** avg width of objects found */
+		int avg_width_of_objects;
+		
+	/** avg hight of objects found */
+		int avg_hight_of_objects;
+	
+	/** avg weight of objects found */
+		int avg_weight_of_objects;
+		
+	/** common width of objects found */
+		int common_width_of_objects;
+		
+	/** common hight of objects found */
+		int common_hight_of_objects;
 
-} hocr_pixbuf;
+	/** commands passed to the ocr */
+		unsigned int command;
+
+	/** error returned from the ocr */
+		unsigned char error;
+
+	/** progress phase of ocr: object identification, page layout anlisis, .. */
+		unsigned char progress_phase;
+
+	/** progress of ocr: 1..100 */
+		unsigned char progress;
+	} hocr_pixbuf;
+
+	int hocr_line_eq_get_y (hocr_line_eq line, int x);
 
 /**
  @brief get objects in a box
@@ -92,11 +149,13 @@ typedef struct
  @param pix pointer to hocr_pixbuf struct.
  @param box pointer to hocr_pixbuf struct.
  @param object_array an array of object to fill.
+ @param size of object_array
  @return the most havy object in the box.
  */
-unsigned int
-hocr_pixbuf_get_objects_in_box (hocr_pixbuf * pix, hocr_box box,
-				unsigned int *object_array);
+	unsigned int
+		hocr_pixbuf_get_objects_in_box (hocr_pixbuf * pix, hocr_box box,
+						unsigned int *object_array,
+						int size);
 
 /**
  @brief get objects inside a box
@@ -104,11 +163,14 @@ hocr_pixbuf_get_objects_in_box (hocr_pixbuf * pix, hocr_box box,
  @param pix pointer to hocr_pixbuf struct.
  @param box pointer to hocr_pixbuf struct.
  @param object_array an array of object to fill.
+ @param size of object_array
  @return the most havy object in the box.
  */
-unsigned int
-hocr_pixbuf_get_objects_inside_box (hocr_pixbuf * pix, hocr_box box,
-				    unsigned int *object_array);
+	unsigned int
+		hocr_pixbuf_get_objects_inside_box (hocr_pixbuf * pix,
+						    hocr_box box,
+						    unsigned int *object_array,
+						    int size);
 
 /**
  @brief get number of channels
@@ -116,7 +178,7 @@ hocr_pixbuf_get_objects_inside_box (hocr_pixbuf * pix, hocr_box box,
  @param pix pointer to hocr_pixbuf struct.
  @return number of color channels in the pixpuf (e.g. 3 for red,green,blue).
  */
-int hocr_pixbuf_get_n_channels (hocr_pixbuf * pix);
+	int hocr_pixbuf_get_n_channels (hocr_pixbuf * pix);
 
 /**
  @brief get height in pixels
@@ -124,7 +186,7 @@ int hocr_pixbuf_get_n_channels (hocr_pixbuf * pix);
  @param pix pointer to hocr_pixbuf struct.
  @return height of pixpuf in pixels.
  */
-int hocr_pixbuf_get_height (hocr_pixbuf * pix);
+	int hocr_pixbuf_get_height (hocr_pixbuf * pix);
 
 /**
  @brief get width in pixels
@@ -132,7 +194,7 @@ int hocr_pixbuf_get_height (hocr_pixbuf * pix);
  @param pix pointer to hocr_pixbuf struct.
  @return width of pixpuf in pixels.
  */
-int hocr_pixbuf_get_width (hocr_pixbuf * pix);
+	int hocr_pixbuf_get_width (hocr_pixbuf * pix);
 
 /**
  @brief get number of bytes in a raw of pixels
@@ -140,7 +202,7 @@ int hocr_pixbuf_get_width (hocr_pixbuf * pix);
  @param pix pointer to hocr_pixbuf struct.
  @return how many bytes are used by the struct for one raw.
  */
-int hocr_pixbuf_get_rowstride (hocr_pixbuf * pix);
+	int hocr_pixbuf_get_rowstride (hocr_pixbuf * pix);
 
 /**
  @brief get value from which a gray-scale pixel is considered white
@@ -148,7 +210,7 @@ int hocr_pixbuf_get_rowstride (hocr_pixbuf * pix);
  @param pix pointer to hocr_pixbuf struct.
  @return value from which a gray-scale pixel is considered white.
  */
-int hocr_pixbuf_get_brightness (hocr_pixbuf * pix);
+	int hocr_pixbuf_get_brightness (hocr_pixbuf * pix);
 
 /**
  @brief get pointer to raw pixpuf data
@@ -156,7 +218,7 @@ int hocr_pixbuf_get_brightness (hocr_pixbuf * pix);
  @param pix pointer to hocr_pixbuf struct.
  @return pointer to raw pixpuf data
  */
-unsigned char *hocr_pixbuf_get_pixels (hocr_pixbuf * pix);
+	unsigned char *hocr_pixbuf_get_pixels (hocr_pixbuf * pix);
 
 /**
  @brief get color of pixel
@@ -166,7 +228,7 @@ unsigned char *hocr_pixbuf_get_pixels (hocr_pixbuf * pix);
  @param y position of pixel on y axis
  @return 1 - if pixel is black, 0 - if pixel is white
  */
-int hocr_pixbuf_get_pixel (hocr_pixbuf * pix, int x, int y);
+	int hocr_pixbuf_get_pixel (hocr_pixbuf * pix, int x, int y);
 
 /**
  @brief set color of pixel color channel
@@ -178,8 +240,8 @@ int hocr_pixbuf_get_pixel (hocr_pixbuf * pix, int x, int y);
  @param value the value to set the chanell to
  @return the color set
  */
-int hocr_pixbuf_set_pixel (hocr_pixbuf * pix, int x, int y, int channel,
-			   int value);
+	int hocr_pixbuf_set_pixel (hocr_pixbuf * pix, int x, int y, int channel,
+				   int value);
 
 /**
  @brief get the object of pixel
@@ -189,8 +251,18 @@ int hocr_pixbuf_set_pixel (hocr_pixbuf * pix, int x, int y, int channel,
  @param y position of pixel on y axis
  @return object number
  */
-unsigned int hocr_pixbuf_get_object (hocr_pixbuf * pix, int x, int y);
+	unsigned int hocr_pixbuf_get_object (hocr_pixbuf * pix, int x, int y);
 
+/**
+ @brief get if there is an object in pixel
+
+ @param pix pointer to hocr_pixbuf struct.
+ @param x position of pixel on x axis
+ @param y position of pixel on y axis
+ @return true 1 object in pixel, 0 is pixel has no object
+ */
+	unsigned int hocr_pixbuf_get_is_object (hocr_pixbuf * pix, int x, int y);
+	
 /**
  @brief set object of pixel
 
@@ -200,8 +272,8 @@ unsigned int hocr_pixbuf_get_object (hocr_pixbuf * pix, int x, int y);
  @param object_numebr the object to set the pixel
  @return the object set
  */
-unsigned int hocr_pixbuf_set_object (hocr_pixbuf * pix, int x, int y,
-				     unsigned int object_numebr);
+	unsigned int hocr_pixbuf_set_object (hocr_pixbuf * pix, int x, int y,
+					     unsigned int object_numebr);
 
 /* hocr_pixbuf_new_from_file function can only open pnm file 
  of type "P4/5" Portable Any Map (PNM) binary, black/white format
@@ -213,15 +285,23 @@ unsigned int hocr_pixbuf_set_object (hocr_pixbuf * pix, int x, int y,
  @param filename path to a pbm file, file must be binary b/w pnm file ("P4/5").
  @return pointer to a newly allocate hocr_pixbuf, or null if can not open file.
  */
-hocr_pixbuf *hocr_pixbuf_new_from_file (const char *filename);
+	hocr_pixbuf *hocr_pixbuf_new_from_file (const char *filename);
+
+/**
+ @brif writes hocr_pixbuf to ppm or pgm file
+
+ @param pixbuf hocr_pixbuf 8 or 24 bpp
+ @param filenme save as file name 
+ @return 1=ok, 0=error
+ */
+	int hocr_pixbuf_save_as_pnm (hocr_pixbuf * pixbuf, char *filename);
 
 /**
  @brief creats a new empty hocr_pixbuf struct 
 
  @return pointer to a newly allocate hocr_pixbuf, or null if can not open file.
  */
-hocr_pixbuf *
-hocr_pixbuf_new (void);
+	hocr_pixbuf *hocr_pixbuf_new (void);
 
 /**
  @brief free a hocr_pixbuf struct from memory
@@ -229,13 +309,24 @@ hocr_pixbuf_new (void);
  @param pix pointer to hocr_pixbuf struct.
  @return 1
  */
-int hocr_pixbuf_unref (hocr_pixbuf * pix);
+	int hocr_pixbuf_unref (hocr_pixbuf * pix);
 
 /**
  @brief create an object map for a given image
 
  @param pix pointer to hocr_pixbuf struct.
  */
-int hocr_pixbuf_create_object_map (hocr_pixbuf * pix);
+	int hocr_pixbuf_create_object_map (hocr_pixbuf * pix);
+
+/**
+ @brief clean artaffects from pixbuf
+ 
+ @ param pix pointer to hocr_pixbuf struct.
+ */
+	int hocr_pixbuf_clean (hocr_pixbuf * pix);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

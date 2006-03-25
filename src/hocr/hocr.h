@@ -103,6 +103,7 @@ extern "C"
  @return 1
  */
 	int hocr_do_ocr (hocr_pixbuf * pix, hocr_text_buffer * text_buffer);
+
 #ifdef __cplusplus
 }
 #endif

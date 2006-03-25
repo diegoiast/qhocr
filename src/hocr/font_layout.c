@@ -199,52 +199,62 @@ get_font_width_class (int font_width, int avg_font_width)
 }
 
 int
-find_font_baseline_eq (hocr_box line, hocr_box * fonts,
-		       hocr_line_eq * base_line, hocr_line_eq * top_line,
-		       int avg_font_hight, int num_of_fonts)
+is_regular_font (hocr_pixbuf * pix, hocr_box font)
+{
+	return ((font.hight < (double) 1.15 * pix->common_hight_of_objects)
+		&& (font.hight > (double) 0.85 * pix->common_hight_of_objects));
+}
+
+int
+find_font_lines_eq_for_fonts (hocr_pixbuf * pix, hocr_box line,
+			      hocr_box * fonts, double *top_a, double *top_b,
+			      double *base_a, double *base_b, int start_at_font,
+			      int end_at_font)
 {
 	int i;
 	int start_counter, end_counter;
 	int x_start, x_end;
-	int y_start, y_end;
+	int y_start_down, y_end_down;
+	int y_start_up, y_end_up;
 	int font_hight;
-
-	/* skip first two letters, they may be line numbering */
-	int start_at = (num_of_fonts > NUM_OF_FONTS_TO_AVG * 4) ? 2 : 0;
+	int num_of_fonts = end_at_font - start_at_font;
 
 	/* if not enogh fonts then just return the line */
 	if (num_of_fonts < NUM_OF_FONTS_TO_AVG)
 	{
 		/* top line is more aqurate in most hebrew textst */
-		base_line->a = 0;
-		base_line->b = line.y1 + avg_font_hight + 1;
-		top_line->a = 0;
-		top_line->b = line.y1;
+		*base_a = 0;
+		*base_b =
+			(fonts[start_at_font].y1 + fonts[end_at_font].y1) / 2 +
+			pix->common_hight_of_objects + 1;
+		*top_a = 0;
+		*top_b = (fonts[start_at_font].y1 + fonts[end_at_font].y1) / 2;
 		return 1;
 	}
 
 	/* avg over NUM_OF_FONTS_TO_AVG fonts */
-	y_start = 0;
-	y_end = 0;
+	y_start_up = 0;
+	y_end_up = 0;
+	y_start_down = 0;
+	y_end_down = 0;
 	x_start = 0;
 	x_end = 0;
 	font_hight = 0;
 
 	start_counter = 0;
 	end_counter = 0;
+
 	/* skip first two letters, they may be line numbering */
-	i = start_at;
-	while (i < num_of_fonts)
+	i = start_at_font;
+	while (i <= end_at_font)
 	{
-		if (fonts[i].hight <
-		    ((1000 + FONT_ASSEND) * avg_font_hight / 1000)
-		    && fonts[i].hight >
-		    ((1000 - FONT_ASSEND) * avg_font_hight / 1000))
+		if (is_regular_font (pix, fonts[i]))
 		{
 			/* take only first NUM_OF_FONTS_TO_AVG to avg */
 			if (start_counter < NUM_OF_FONTS_TO_AVG)
 			{
-				y_start += fonts[i].y1;
+				y_start_up += fonts[i].y1;
+				y_start_down += fonts[i].y2;
 				x_start += fonts[i].x2;
 				font_hight += fonts[i].hight;
 				start_counter++;
@@ -254,19 +264,17 @@ find_font_baseline_eq (hocr_box line, hocr_box * fonts,
 	}
 
 	/* skip first two letters, they may be line numbering */
-	i = num_of_fonts - start_at;
-	while (i > 0)
+	i = end_at_font;
+	while (i >= start_at_font)
 	{
 		i--;
-		if (fonts[i].hight <
-		    ((1000 + FONT_ASSEND) * avg_font_hight / 1000)
-		    && fonts[i].hight >
-		    ((1000 - FONT_ASSEND) * avg_font_hight / 1000))
+		if (is_regular_font (pix, fonts[i]))
 		{
 			/* take only last NUM_OF_FONTS_TO_AVG to avg */
 			if (end_counter < NUM_OF_FONTS_TO_AVG)
 			{
-				y_end += fonts[i].y1;
+				y_end_up += fonts[i].y1;
+				y_end_down += fonts[i].y2;
 				x_end += fonts[i].x1;
 				font_hight += fonts[i].hight;
 				end_counter++;
@@ -278,17 +286,21 @@ find_font_baseline_eq (hocr_box line, hocr_box * fonts,
 	if (start_counter == 0 || end_counter == 0)
 	{
 		/* top line is more aqurate in most hebrew textst */
-		base_line->a = 0;
-		base_line->b = line.y1 + avg_font_hight + 1;
-		top_line->a = 0;
-		top_line->b = line.y1;
+		*base_a = 0;
+		*base_b =
+			(fonts[start_at_font].y1 + fonts[end_at_font].y1) / 2 +
+			pix->avg_width_of_objects + 1;
+		*top_a = 0;
+		*top_b = (fonts[start_at_font].y1 + fonts[end_at_font].y1) / 2;
 		return 1;
 	}
 
 	/* if here then counter is not zero, i can avarage */
-	y_start /= start_counter;
+	y_start_up /= start_counter;
+	y_start_down /= start_counter;
 	x_start /= start_counter;
-	y_end /= end_counter;
+	y_end_up /= end_counter;
+	y_end_down /= end_counter;
 	x_end /= end_counter;
 	font_hight /= (end_counter + start_counter);
 
@@ -296,21 +308,53 @@ find_font_baseline_eq (hocr_box line, hocr_box * fonts,
 	if ((x_end - x_start) == 0)
 	{
 		/* top line is more aqurate in most hebrew textst */
-		base_line->a = 0;
-		base_line->b = line.y1 + font_hight + 1;
-		top_line->a = 0;
-		top_line->b = line.y1;
+		*base_a = 0;
+		*base_b =
+			(fonts[start_at_font].y1 + fonts[end_at_font].y1) / 2 +
+			font_hight + 1;
+		*top_a = 0;
+		*top_b = (fonts[start_at_font].y1 + fonts[end_at_font].y1) / 2;
 		return 1;
 	}
 
 	/* make line equation (x_end - x_start) is not zero */
-	top_line->a = (double) (y_end - y_start) / (double) (x_end - x_start);
+	*top_a = (double) (y_end_up - y_start_up) / (double) (x_end - x_start);
+	*base_a =
+		(double) (y_end_down - y_start_down) / (double) (x_end -
+								 x_start);
 
-	/* FIXME: assume line is horizonatal and parallel ? */
-	base_line->a = top_line->a;
+	*top_b = y_start_up - *top_a * x_start;
+	*base_b = y_start_down - *base_a * x_start + 1;
 
-	top_line->b = y_start - top_line->a * x_start;
-	base_line->b = top_line->b + font_hight + 1;
+	return 0;
+}
+
+int
+find_font_baseline_eq (hocr_pixbuf * pix, hocr_box line, hocr_box * fonts,
+		       hocr_line_eq * base_line, hocr_line_eq * top_line,
+		       int num_of_fonts)
+{
+	double top_a, top_b, base_a, base_b;
+
+	if (num_of_fonts > 10)
+		find_font_lines_eq_for_fonts (pix, line, fonts,
+					      &top_a, &top_b, &base_a,
+					      &base_b, 3, num_of_fonts - 3);
+	else
+		find_font_lines_eq_for_fonts (pix, line, fonts,
+					      &top_a, &top_b, &base_a,
+					      &base_b, 0, num_of_fonts - 1);
+
+	top_line->x1 = line.x2;
+	base_line->x1 = top_line->x1;
+	base_line->a1 = base_a;
+	base_line->b1 = base_b;
+	top_line->a1 = top_a;
+	top_line->b1 = top_b;
+
+	/* look for the most out of line font */
+
+	return 1;
 
 	return 0;
 }
