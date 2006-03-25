@@ -13,12 +13,13 @@
 #include <QTextEdit>
 #include <QPixmap>
 
+#include "hocr.h"
 #include "pixmapviewer.h"
 #include "ui_hocr_options.h"
 
 class MainWindow: public QMainWindow
 {
-Q_OBJECT
+	Q_OBJECT
 
 public:
 	MainWindow( QWidget *parent=0 );
@@ -40,14 +41,16 @@ public slots:
 	void apply_hocr_settings();
 	void saveStatus();
 	void loadStatus();
-
 	void closeEvent(QCloseEvent *event);
+	
+	void doOCR();
+	void updateTimer();
+	virtual void timerEvent();
 
 private:
 	void viewImage( QString fileName );
 	bool saveHTML( QString fileName, QString text );
 	bool saveText( QString fileName, QString text, bool unicode );
-	void doOCR();
 
 	QAction     *actionAbout;
 	QAction     *actionAboutQt;
@@ -91,6 +94,7 @@ private:
 	bool hocr_output_with_debug_text;
 
 	int hocr_brightness;
+	hocr_pixbuf *hocr_pix;
 };
 
 #endif //__MAIN_WINDOW_H__

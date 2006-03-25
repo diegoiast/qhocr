@@ -8,18 +8,13 @@
 #include <QSettings>
 #include <QTime>
 #include <QtDebug>
-
-
-extern "C"
-{
-#include "hocr.h"
-#include "hocr_textbuffer.h"
-}
+#include <QThread>
+#include <QTimer>
 
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
 
-#define TITLE "QHOCR 0.6.3"
+#define TITLE "QHOCR 0.7.0"
 
 MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 {
@@ -52,6 +47,7 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
  	connect(ui.applyButton, SIGNAL(clicked()), this, SLOT(apply_hocr_settings()));
 
 	// set default options for viewing images
+	hocr_pix = NULL;
 	hocr_ocr_type_regular = true;
 	hocr_ocr_type_columns = true;
 	hocr_ocr_type_nikud = true;
@@ -64,7 +60,7 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 
 	setWindowTitle( TITLE );
 	loadStatus();
-//	viewImage( "tests/test3.,jpg" );
+//	viewImage( "tests/test3.jpg" );
 }
 
 void MainWindow::createActions()
@@ -153,11 +149,11 @@ void MainWindow::createToolbars()
 void MainWindow::on_aboutButton_clicked()
 {
 	QMessageBox::information( 0, 
-"About QHOCR 0.5.0", "QHOCR - a Qt4 GUI front end to the HOCR library"
+"About QHOCR 0.7.0", "QHOCR - a Qt4 GUI front end to the HOCR library"
 "<br>Diego Iastrubni &lt;elcuco@kde.org&gt; 2005"
 "<br><br>This application is free software, released under the terms of GPL"
 "read LICENSE.GPL for more intormation."
-"<br>This application uses <b>libhocr 0.5</b> by Kobi Zamir &lt;kzamir@walla.co.il&gt; http://hocr.berlios.de"
+"<br>This application uses <b>libhocr 0.7</b> by Kobi Zamir &lt;kzamir@walla.co.il&gt; http://hocr.berlios.de"
 );
 }
 
@@ -242,10 +238,6 @@ void MainWindow::on_bestFit_clicked()
 
 void MainWindow::on_options_clicked()
 {
-// 	QDialog *dlg = new QDialog;
-// 	ui.setupUi(dlg);
-//  	connect(ui.applyButton, SIGNAL(clicked()), this, SLOT(apply_hocr_settings()));
-
 	ui.cbRegular->setChecked(hocr_ocr_type_regular);
 	ui.cbColumns->setChecked(hocr_ocr_type_columns);
 	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
@@ -258,9 +250,8 @@ void MainWindow::on_options_clicked()
 
 	ui.sliderBrightness->setValue(hocr_brightness);
 
-// 	dlg->show();
 	optionsDialog.show();
-	apply_hocr_settings();
+// 	apply_hocr_settings();
 }
 
 void MainWindow::apply_hocr_settings()
@@ -277,7 +268,7 @@ void MainWindow::apply_hocr_settings()
 
 	hocr_brightness = ui.sliderBrightness->value();
 
-	doOCR();
+	QTimer::singleShot( 0, this, SLOT(doOCR()));
 }
 
 void MainWindow::saveStatus()
@@ -341,7 +332,7 @@ void MainWindow::viewImage( QString fileName )
 		return;
 
 	savedImage.load( fileName );
-	doOCR();
+	QTimer::singleShot( 0, this, SLOT(doOCR()));
 	
 	setWindowTitle( QString(TITLE) + " - " + fileName );
 	imageFilename = fileName;
@@ -489,25 +480,44 @@ void MainWindow::doOCR()
 
 void MainWindow::doOCR()
 {
-	hocr_pixbuf *hocr_pix;
-	hocr_text_buffer *text;
-		text = hocr_text_buffer_new();
-        hocr_pix = hocr_pixbuf_new ();
-        scannedImage = savedImage;
-        imageLabel->setImage( scannedImage );
+	hocr_pix = hocr_pixbuf_new();
+	hocr_text_buffer *text = hocr_text_buffer_new();
+	
+	statusBar()->showMessage( QString("Processing image: %1%").arg(0), 1 );
+	
+	/*
+	QTimer *timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
+	timer->setInterval( 1 );
+	timer->setSingleShot( false );
+	timer->start();
+	*/
+
+	scannedImage = savedImage;
+	imageLabel->setImage( scannedImage );
 		
-	//FILE *f = fopen ("c:\\app-error-2.txt", "rw");	
-	//fprintf( f, "before init - 142" );
-//	fclose( f );
-		    
 	hocr_pix->command = 0;
-	hocr_pix->command |= HOCR_COMMAND_COLOR_BOXES;
-	hocr_pix->command |= HOCR_COMMAND_COLOR_MISREAD;
 	hocr_pix->command |= HOCR_COMMAND_OCR;
-	hocr_pix->command |= HOCR_COMMAND_DICT;
-	hocr_pix->command |= HOCR_COMMAND_NIKUD;
-	hocr_pix->command |= HOCR_COMMAND_USE_SPACE_FOR_TAB;
-	hocr_pix->command |= HOCR_COMMAND_USE_INDENTATION;
+	
+// 	if (hocr_ocr_type_regular)
+// 	if (hocr_ocr_type_columns)
+// 	if (hocr_ocr_type_table)
+// 	if (hocr_ocr_type_no_font_recognition)
+// 	if (hocr_output_just_ocr)
+// 	if (hocr_output_with_debug_text)
+	
+// 	hocr_pix->command |= HOCR_COMMAND_DICT;
+// 	hocr_pix->command |= HOCR_COMMAND_USE_SPACE_FOR_TAB;
+// 	hocr_pix->command |= HOCR_COMMAND_USE_INDENTATION;
+	
+	if (hocr_ocr_type_nikud)
+		hocr_pix->command |= HOCR_COMMAND_NIKUD;
+	
+	if (hocr_output_with_graphics)
+	{
+		hocr_pix->command |= HOCR_COMMAND_COLOR_BOXES;
+		hocr_pix->command |= HOCR_COMMAND_COLOR_MISREAD;
+	}
 
 	hocr_pix->n_channels	= scannedImage.depth() / 8;
 	hocr_pix->height	= scannedImage.size().height();
@@ -516,11 +526,29 @@ void MainWindow::doOCR()
 	hocr_pix->pixels	= scannedImage.bits();
 	hocr_pix->brightness    = hocr_brightness;
 
-        hocr_do_ocr (hocr_pix, text);
-        scannedText->setPlainText( QString::fromUtf8(text->text) );
-        imageLabel->setImage( scannedImage );
+	scannedText->clear();
+	hocr_do_ocr (hocr_pix, text);
+	scannedText->setPlainText( QString::fromUtf8(text->text) );
+	imageLabel->setImage( scannedImage );
 
 	hocr_pix->pixels = NULL;
-	hocr_pixbuf_unref (hocr_pix);
-	hocr_text_buffer_unref (text);
+	hocr_pixbuf_unref( hocr_pix );
+	hocr_text_buffer_unref( text );
+	hocr_pix = NULL;
+// 	timer->stop();
+	statusBar()->showMessage( "Procecing image done", 5000 );
+}
+
+void MainWindow::updateTimer()
+{
+// 	if (hocr_pix == NULL)
+// 		return;
+
+	qDebug("1");
+	statusBar()->showMessage( QString("Processing image: %1%").arg(hocr_pix->progress), 1 );
+}
+
+void MainWindow::timerEvent()
+{
+	updateTimer();
 }
