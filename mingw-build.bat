@@ -18,7 +18,7 @@ set MY_QT_DIR=c:\qt
 set MY_MINGW_DIR=c:\mingw
 
 set MY_APPNAME=qhocr
-
+SET QTDIR=
 rem *
 rem * if QTDIR is not set, lets use user defaults. Oterwise, we can use the ones from the system
 rem *
