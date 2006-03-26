@@ -12,10 +12,22 @@
 #include <QStatusBar>
 #include <QTextEdit>
 #include <QPixmap>
+#include <QThread>
 
 #include "hocr.h"
 #include "pixmapviewer.h"
 #include "ui_hocr_options.h"
+
+class HOCRThread: public QThread
+{
+public:
+	HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  );
+	virtual void run();
+	
+private:
+	hocr_pixbuf *pix;
+	hocr_text_buffer *text;
+};
 
 class MainWindow: public QMainWindow
 {
@@ -44,8 +56,7 @@ public slots:
 	void closeEvent(QCloseEvent *event);
 	
 	void doOCR();
-	void updateTimer();
-	virtual void timerEvent();
+	virtual void timerEvent(QTimerEvent *event);
 
 private:
 	void viewImage( QString fileName );
@@ -92,9 +103,12 @@ private:
 	bool hocr_output_just_ocr;
 	bool hocr_output_with_graphics;
 	bool hocr_output_with_debug_text;
-
 	int hocr_brightness;
+
+	int hocr_timer;
+	HOCRThread *hocr_thread;
 	hocr_pixbuf *hocr_pix;
+	hocr_text_buffer *hocr_text;
 };
 
 #endif //__MAIN_WINDOW_H__

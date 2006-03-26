@@ -16,6 +16,18 @@
 
 #define TITLE "QHOCR 0.7.0"
 
+HOCRThread::HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  )
+{
+	pix = p;
+	text = t;
+}
+
+void HOCRThread::run()
+{
+	hocr_do_ocr (pix, text);
+}
+
+
 MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 {
 	createActions();
@@ -59,7 +71,10 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	hocr_brightness = 100;
 
 	setWindowTitle( TITLE );
+	hocr_timer = 0;
+	hocr_thread = NULL;
 	loadStatus();
+	
 //	viewImage( "tests/test3.jpg" );
 }
 
@@ -73,10 +88,9 @@ void MainWindow::createActions()
 	actionZoomNormal = new QAction( tr("1:1"), this );
 	actionExit       = new QAction( tr("Quit"), this );
 	actionAbout      = new QAction( tr("About..."), this );
-	actionBestFit    = new QAction( tr("Toggle best fit"), this );
+	actionBestFit    = new QAction( tr("Best fit"), this );
 	actionAboutQt    = new QAction(tr("About &Qt"), this);
 	actionOptions    = new QAction(tr("HOCR &Preferences"), this);
-
 
 	actionLoadImage ->setShortcut(tr("Ctrl+O"));
 	actionSaveText  ->setShortcut(tr("Ctrl+S"));
@@ -84,8 +98,10 @@ void MainWindow::createActions()
 	actionZoomOut   ->setShortcut(tr("Ctrl+-"));
 	actionZoomNormal->setShortcut(tr("Ctrl+="));
 	actionExit      ->setShortcut(tr("Ctrl+Q"));
-	actionBestFit   ->setShortcut(tr("Ctrl+A"));
 	actionOptions   ->setShortcut(tr("Ctrl+H"));
+	actionBestFit   ->setShortcut(tr("Ctrl+A"));
+	actionBestFit   ->setCheckable( true );
+	actionBestFit   ->setChecked(false);
 
 	actionAboutQt->setStatusTip(tr("Show the Qt library's About box"));
 	
@@ -106,6 +122,7 @@ void MainWindow::createActions()
 	actionZoomNormal->setEnabled( false );
 	actionZoomIn->setEnabled( false );
 	actionZoomOut->setEnabled( false );
+	actionZoomNormal->setEnabled( false );
 }
 
 void MainWindow::createMenus()
@@ -230,10 +247,10 @@ void MainWindow::on_bestFit_clicked()
 	bool b = imageLabel->getBestFit();
 	imageLabel->setBestFit( !b );
 
-	// we need to set !imageLabel->getbestFit(), it's a hack, but it works :)
 	actionZoomNormal->setEnabled( b );
 	actionZoomIn->setEnabled( b );
 	actionZoomOut->setEnabled( b );
+	actionZoomNormal->setEnabled( b );
 }
 
 void MainWindow::on_options_clicked()
@@ -251,7 +268,6 @@ void MainWindow::on_options_clicked()
 	ui.sliderBrightness->setValue(hocr_brightness);
 
 	optionsDialog.show();
-// 	apply_hocr_settings();
 }
 
 void MainWindow::apply_hocr_settings()
@@ -311,10 +327,15 @@ void MainWindow::loadStatus()
 	hocr_output_with_graphics   = settings.value( "hocr-output/graphics", false ).toBool();
 	hocr_output_with_debug_text = settings.value( "hocr-output/debug", false ).toBool();
 	hocr_brightness             = settings.value( "hocr/brightness", 100).toInt();
-	
-	imageLabel->setBestFit( settings.value("main/bestfit", true).toBool() );
+
+	bool bestFit = settings.value("main/bestfit", true).toBool();
+	actionBestFit->setChecked( bestFit );
+	actionZoomIn ->setEnabled( !bestFit );
+	actionZoomOut->setEnabled( !bestFit );
+	actionZoomNormal->setEnabled( !bestFit );
+	imageLabel->setBestFit( bestFit );
 	imageLabel->setZoomFactor( settings.value("main/zoom", "1").toDouble() );
-	
+		
 	viewImage( settings.value( "main/image" ).toString() );
 }
 
@@ -331,6 +352,25 @@ void MainWindow::viewImage( QString fileName )
 	if (fileName.isEmpty())
 		return;
 
+	if (hocr_thread !=NULL)
+	{
+		hocr_thread->quit();
+		while(hocr_thread->isRunning());
+		delete hocr_thread;
+		hocr_thread = NULL;
+		
+		scannedText->clear();
+		hocr_pix->pixels = NULL;
+		hocr_pixbuf_unref( hocr_pix );
+		hocr_text_buffer_unref( hocr_text );
+	}
+
+	if (hocr_timer != 0)
+	{
+		killTimer(hocr_timer);
+		hocr_timer = 0;
+	}
+	
 	savedImage.load( fileName );
 	QTimer::singleShot( 0, this, SLOT(doOCR()));
 	
@@ -481,18 +521,10 @@ void MainWindow::doOCR()
 void MainWindow::doOCR()
 {
 	hocr_pix = hocr_pixbuf_new();
-	hocr_text_buffer *text = hocr_text_buffer_new();
+	hocr_text = hocr_text_buffer_new();
 	
-	statusBar()->showMessage( QString("Processing image: %1%").arg(0), 1 );
+	statusBar()->showMessage( QString("Processing image: %1%").arg(0), 300 );
 	
-	/*
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
-	timer->setInterval( 1 );
-	timer->setSingleShot( false );
-	timer->start();
-	*/
-
 	scannedImage = savedImage;
 	imageLabel->setImage( scannedImage );
 		
@@ -527,28 +559,37 @@ void MainWindow::doOCR()
 	hocr_pix->brightness    = hocr_brightness;
 
 	scannedText->clear();
-	hocr_do_ocr (hocr_pix, text);
-	scannedText->setPlainText( QString::fromUtf8(text->text) );
-	imageLabel->setImage( scannedImage );
-
-	hocr_pix->pixels = NULL;
-	hocr_pixbuf_unref( hocr_pix );
-	hocr_text_buffer_unref( text );
-	hocr_pix = NULL;
-// 	timer->stop();
-	statusBar()->showMessage( "Procecing image done", 5000 );
+	hocr_thread = new HOCRThread( hocr_pix, hocr_text );
+	hocr_thread->start();
+	hocr_timer = startTimer( 50 );
 }
 
-void MainWindow::updateTimer()
+void MainWindow::timerEvent(QTimerEvent *event)
 {
-// 	if (hocr_pix == NULL)
-// 		return;
+	if (hocr_pix == NULL)
+		return;
 
-	qDebug("1");
-	statusBar()->showMessage( QString("Processing image: %1%").arg(hocr_pix->progress), 1 );
-}
+	int percentage = (int)(100*(hocr_pix->progress/255.));
+	statusBar()->showMessage( QString("Processing image: %1%").arg(percentage), 3000 );
+	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
 
-void MainWindow::timerEvent()
-{
-	updateTimer();
+	if (hocr_thread->isFinished())
+	{
+		imageLabel->setImage( scannedImage );
+
+		scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
+		hocr_pix->pixels = NULL;
+		hocr_pixbuf_unref( hocr_pix );
+		hocr_text_buffer_unref( hocr_text );
+		hocr_pix = NULL;
+		statusBar()->showMessage( "Procecing image done", 5000 );
+
+		killTimer( hocr_timer );
+		hocr_timer = 0;
+		delete hocr_thread;
+		hocr_thread = NULL;
+	}
+
+	// ugly hack to shut up warnings
+	event = 0;
 }
