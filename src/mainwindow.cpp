@@ -165,7 +165,7 @@ void MainWindow::createToolbars()
 
 void MainWindow::on_aboutButton_clicked()
 {
-	QMessageBox::information( 0, 
+	QMessageBox::information( 0,
 "About QHOCR 0.7.0", "QHOCR - a Qt4 GUI front end to the HOCR library"
 "<br>Diego Iastrubni &lt;elcuco@kde.org&gt; 2005"
 "<br><br>This application is free software, released under the terms of GPL"
@@ -204,7 +204,7 @@ void MainWindow::on_saveButton_clicked()
 	if (s.isEmpty())
 		return;
 	
-	bool status;	
+	bool status;
 	if (s.endsWith(".html") || s.endsWith(".htm"))
 		status = saveHTML( s, scannedText->toPlainText() );
 	else if (s.endsWith(".utf8"))
@@ -267,7 +267,10 @@ void MainWindow::on_options_clicked()
 
 	ui.sliderBrightness->setValue(hocr_brightness);
 
-	optionsDialog.show();
+	if (optionsDialog.isHidden())
+		optionsDialog.show();
+	else
+		optionsDialog.hide();
 }
 
 void MainWindow::apply_hocr_settings()
@@ -341,6 +344,7 @@ void MainWindow::loadStatus()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+	optionsDialog.hide();
 	saveStatus();
 
 	// ugly hack to shut up warnings...
@@ -393,7 +397,7 @@ bool MainWindow::saveHTML( QString fileName, QString text )
 	QString html = file.readAll();
 	html = QString(html).arg("File created by QHOCT - a Qt4 GUI for HOCR").arg( text );
 	QTextStream out(&file);
-	out.setCodec(QTextCodec::codecForName("UTF-8")); 
+	out.setCodec(QTextCodec::codecForName("UTF-8"));
 	out << html;
 
 	return true;
@@ -415,115 +419,10 @@ bool MainWindow::saveText( QString fileName, QString text, bool unicode )
 	return true;
 }
 
-#if 0
-void MainWindow::doOCR()
-{
-// 	hocr_error        error;
-// 	hocr_ocr_type     ocr_type   = (hocr_ocr_type)0;
-// 	hocr_output       ocr_output = (hocr_output)0;
-	hocr_pixbuf      *pix;
-	hocr_text_buffer *text_buffer;
-
-	// convert our QPixmap into something hocr can use
-	text_buffer = hocr_text_buffer_new();
-	scannedImage = savedImage;
-	pix = (hocr_pixbuf *) malloc (sizeof (hocr_pixbuf));
-
-	// setup hocr options
-	pix->command = 0;
-// 	if (hocr_output_with_graphics)	pix->command |= HOCR_COMMAND_COLOR_BOXES;
-	//HOCR_COMMAND_COLOR_MISREAD
-	pix->command |= HOCR_COMMAND_OCR;
-	//HOCR_COMMAND_DICT
-// 	if (hocr_ocr_type_nikud)	pix->command |= HOCR_COMMAND_NIKUD;
-	//HOCR_COMMAND_USE_SPACE_FOR_TAB
-	//HOCR_COMMAND_USE_INDENTATION
-	
-	pix->n_channels = scannedImage.depth() / 8;
-	pix->height     = scannedImage.size().height();
-	pix->width      = scannedImage.size().width();
-	pix->rowstride  = scannedImage.bytesPerLine();
-	pix->pixels     = scannedImage.bits();
-	pix->brightness = hocr_brightness;
-	
-/*	
-	if (hocr_ocr_type_regular)              ocr_type = (hocr_ocr_type) (ocr_type|HOCR_OCR_TYPE_REGULAR);
-	if (hocr_ocr_type_columns)              ocr_type = (hocr_ocr_type) (ocr_type|HOCR_OCR_TYPE_COLUMNS);
-	if (hocr_ocr_type_nikud)                ocr_type = (hocr_ocr_type) (ocr_type|HOCR_OCR_TYPE_NIKUD);
-	if (hocr_ocr_type_table)                ocr_type = (hocr_ocr_type) (ocr_type|HOCR_OCR_TYPE_TABLE);
-	if (hocr_ocr_type_no_font_recognition)  ocr_type = (hocr_ocr_type) (ocr_type|HOCR_OCR_TYPE_NO_FONT_RECOGNITION);
-	if (hocr_output_just_ocr)               ocr_output = (hocr_output) (ocr_output|HOCR_OUTPUT_JUST_OCR);
-//	if (hocr_output_with_graphics)          ocr_output = (hocr_output) (ocr_output|HOCR_OUTPUT_WITH_GRAPHICS);
-	if (hocr_output_with_debug_text)        ocr_output = (hocr_output) (ocr_output|HOCR_OUTPUT_WITH_DEBUG_TEXT);
-*/
-
-
-	// is an error is found, it will die anyway
-	// btw, it does not work - gcc sux0rz :)
-	try{
-		//hocr_do_ocr (&pix, text_buffer, 0, HOCR_OUTPUT_JUST_OCR, HOCR_OCR_TYPE_REGULAR, &error);
-//		hocr_do_ocr( pix, text_buffer, 0, ocr_output, ocr_type, &error );
-		hocr_do_ocr( pix, text_buffer );
-		scannedText->setPlainText( QString::fromUtf8(text_buffer->text) );
-		
-/*		switch (error)
-		{
-			case HOCR_ERROR_OK:
-				statusBar()->showMessage( 
-					tr("%1 - Image loaded and recognized").arg(QTime::currentTime().toString()),
-					5000 );
-				break;
-
-			case HOCR_ERROR_NO_LINES_FOUND:
-				statusBar()->showMessage( 
-					tr("%1 - hocr: can\'t find readble lines in input").arg(QTime::currentTime().toString()),
-					5000 );
-				break;
-
-			case HOCR_ERROR_NO_FONTS_FOUND:
-				statusBar()->showMessage( 
-					tr("%1 - hocr: can\'t find readble fonts in input").arg(QTime::currentTime().toString()),
-					5000 );
-				break;
-				
-			case HOCR_ERROR_OUT_OF_MEMORY:
-				statusBar()->showMessage( 
-					tr("%1 - hocr: out of memory while reading").arg(QTime::currentTime().toString()),
-					5000 );
-				break;
-				
-			case HOCR_ERROR_NOT_HORIZONTAL_LINE:
-				statusBar()->showMessage( 
-					tr("%1 - hocr: found non horizontal line in text").arg(QTime::currentTime().toString()),
-					5000 );
-				break;
-				
-			default:
-				statusBar()->showMessage( tr("hocr: unknown error while reading") );
-				break;
-		} // end switch(error)
-		*/
-		// remember this is a special pix, hocr will try to free also the bits memory as well
-		pix->pixels = NULL;
-		hocr_pixbuf_unref( pix );
-		hocr_text_buffer_unref( text_buffer );
-		imageLabel->setImage( scannedImage );
-	}
-	catch(...){
-		statusBar()->showMessage(
-			tr("%1 - Failed at hocr_do_ocr()").arg(QTime::currentTime().toString()), 
-			5000 );
-		imageLabel->setImage( savedImage );
-	}
-}
-#endif
-
 void MainWindow::doOCR()
 {
 	hocr_pix = hocr_pixbuf_new();
 	hocr_text = hocr_text_buffer_new();
-	
-	statusBar()->showMessage( QString("Processing image: %1%").arg(0), 300 );
 	
 	scannedImage = savedImage;
 	imageLabel->setImage( scannedImage );
@@ -538,7 +437,7 @@ void MainWindow::doOCR()
 // 	if (hocr_output_just_ocr)
 // 	if (hocr_output_with_debug_text)
 	
-// 	hocr_pix->command |= HOCR_COMMAND_DICT;
+	hocr_pix->command |= HOCR_COMMAND_DICT;
 // 	hocr_pix->command |= HOCR_COMMAND_USE_SPACE_FOR_TAB;
 // 	hocr_pix->command |= HOCR_COMMAND_USE_INDENTATION;
 	
@@ -558,10 +457,23 @@ void MainWindow::doOCR()
 	hocr_pix->pixels	= scannedImage.bits();
 	hocr_pix->brightness    = hocr_brightness;
 
+#if 1
 	scannedText->clear();
 	hocr_thread = new HOCRThread( hocr_pix, hocr_text );
 	hocr_thread->start();
+	QTimer::singleShot( 0, this, SLOT(doOCR_async()));
 	hocr_timer = startTimer( 50 );
+#else
+	statusBar()->showMessage( "Processing image started..." );
+	hocr_do_ocr (hocr_pix, hocr_text);
+	imageLabel->setImage( scannedImage );
+	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
+	hocr_pix->pixels = NULL;
+	hocr_pixbuf_unref( hocr_pix );
+	hocr_text_buffer_unref( hocr_text );
+	hocr_pix = NULL;
+	statusBar()->showMessage( "Processing image done", 5000 );
+#endif
 }
 
 void MainWindow::timerEvent(QTimerEvent *event)
@@ -569,7 +481,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
 	if (hocr_pix == NULL)
 		return;
 
-	int percentage = (int)(100*(hocr_pix->progress/255.));
+	int percentage = (int)(100*(hocr_pix->progress+2)/256.);
 	statusBar()->showMessage( QString("Processing image: %1%").arg(percentage), 3000 );
 	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
 
@@ -582,14 +494,14 @@ void MainWindow::timerEvent(QTimerEvent *event)
 		hocr_pixbuf_unref( hocr_pix );
 		hocr_text_buffer_unref( hocr_text );
 		hocr_pix = NULL;
-		statusBar()->showMessage( "Procecing image done", 5000 );
+		statusBar()->showMessage( "Processing image done", 5000 );
 
 		killTimer( hocr_timer );
 		hocr_timer = 0;
 		delete hocr_thread;
 		hocr_thread = NULL;
 	}
-
+	
 	// ugly hack to shut up warnings
 	event = 0;
 }
