@@ -1,3 +1,13 @@
+0.8.2
+bugs
+ 1) I need to use the non native load dialog, since the native one
+    just stuckes the application on win32. 
+
+whishes
+ 1) It's time to move lihocr into *.DLL or *.so
+ 2) PDF input? 
+ 3) Print? PDF output?
+ 
 0.47
 bugs
  1) save and loading of fonts is not perfect (saves familiy, not size+wieght)

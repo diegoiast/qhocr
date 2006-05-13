@@ -1,13 +1,13 @@
 This project is Dual Licensed: GPL+BSD.
 
-The license of libhocr and Qt4 are GPL. For this reason the effective 
+The license of libhocr and Qt4 is GPL. For this reason the effective 
 license of this application is GPL. The about box of the application says GPL because 
 of that reason.
 
 However...
-If you find some code I wrote and you like it (all the CPP files), 
-you can copy it into a BSD project without any problems, just be 
-sure your project is BSD. 
+If you find some code I wrote and you like it (basically all the CPP files), 
+you can copy it into a BSD project without any problems, just be sure your 
+project is BSD. 
 
 Don't worry, this is still free software :)
 

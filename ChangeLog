@@ -5,7 +5,7 @@ qhocr (0.8.2)
   * Configuration is changed in a single window now
   * HOCR is now called in another thread, and does not block the GUI
   * Added a local directory for plugins - for win32 binary releases
-  -- Diego Iastrubni <elcuco@kde.org>	Sat, 24 Sep 21:00
+  -- Diego Iastrubni <elcuco@kde.org>	Sat, 13 May 2006 17:00
   
 qhocr (0.5.0)
   * New HOCR library, pulled out of SVN 24-sep-2005, V0.5
