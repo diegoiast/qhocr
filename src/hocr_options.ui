@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>219</height>
+    <width>504</width>
+    <height>276</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -23,107 +23,57 @@
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
-    <number>7</number>
+    <number>9</number>
    </property>
    <property name="spacing" >
-    <number>0</number>
+    <number>6</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
+    <widget class="QTabWidget" name="tabWidget" >
+     <property name="currentIndex" >
       <number>0</number>
      </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QGroupBox" name="groupBox" >
-       <property name="title" >
-        <string>OCR Options</string>
-       </property>
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>8</number>
-        </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
-         <widget class="QCheckBox" name="cbRegular" >
-          <property name="text" >
-           <string>&amp;Regular</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbColumns" >
-          <property name="text" >
-           <string>Co&amp;lumns</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbNikud" >
-          <property name="text" >
-           <string>&amp;Nikud</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbTable" >
-          <property name="text" >
-           <string>&amp;Table</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbNoFont" >
-          <property name="text" >
-           <string>No &amp;font recognition</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
+     <widget class="QWidget" name="tab" >
+      <attribute name="title" >
+       <string>OCR</string>
+      </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
-        <number>0</number>
+        <number>9</number>
        </property>
        <property name="spacing" >
         <number>6</number>
        </property>
        <item>
-        <widget class="QGroupBox" name="groupBox_2" >
+        <widget class="QGroupBox" name="groupBox" >
          <property name="title" >
-          <string>Output</string>
+          <string>OCR Options</string>
          </property>
          <layout class="QVBoxLayout" >
           <property name="margin" >
-           <number>8</number>
+           <number>9</number>
           </property>
           <property name="spacing" >
            <number>6</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="cbJustOCR" >
+           <widget class="QCheckBox" name="cbDictionary" >
             <property name="text" >
-             <string>&amp;Just OCR</string>
+             <string>&amp;Use dictionary</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="cbGraphics" >
+           <widget class="QCheckBox" name="cbColumns" >
             <property name="text" >
-             <string>&amp;Graphics</string>
+             <string>Co&amp;lumns</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="cbDebug" >
+           <widget class="QCheckBox" name="cbNikud" >
             <property name="text" >
-             <string>&amp;Debug</string>
+             <string>&amp;Nikud</string>
             </property>
            </widget>
           </item>
@@ -131,51 +81,105 @@
         </widget>
        </item>
        <item>
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
          </property>
-         <property name="sizeHint" >
-          <size>
-           <width>20</width>
-           <height>50</height>
-          </size>
+         <property name="spacing" >
+          <number>6</number>
          </property>
-        </spacer>
+         <item>
+          <widget class="QLabel" name="label" >
+           <property name="text" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Brightness&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="sliderBrightness" >
+           <property name="maximum" >
+            <number>255</number>
+           </property>
+           <property name="value" >
+            <number>100</number>
+           </property>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label" >
-       <property name="text" >
-        <string>&lt;html>&lt;head>&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; />&lt;/head>&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-weight:400; font-style:normal; text-decoration:none;&quot;>&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;>Brightness&lt;/p>&lt;/body>&lt;/html></string>
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>Display</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSlider" name="sliderBrightness" >
-       <property name="maximum" >
-        <number>255</number>
+       <property name="spacing" >
+        <number>6</number>
        </property>
-       <property name="value" >
-        <number>100</number>
-       </property>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
+       <item>
+        <widget class="QCheckBox" name="cbGraphics" >
+         <property name="text" >
+          <string>Debug glyphs</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_2" >
+           <property name="text" >
+            <string>Recgnized text font</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>158</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="textFontPreview" >
+           <property name="frame" >
+            <bool>false</bool>
+           </property>
+           <property name="readOnly" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnTextFont" >
+           <property name="text" >
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" >

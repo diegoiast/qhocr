@@ -14,7 +14,7 @@
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
 
-#define TITLE "QHOCR 0.7.0"
+#define TITLE "QHOCR 0.8.2"
 
 HOCRThread::HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  )
 {
@@ -56,18 +56,13 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 
 	// non-modal options dialog
 	ui.setupUi(&optionsDialog);
- 	connect(ui.applyButton, SIGNAL(clicked()), this, SLOT(apply_hocr_settings()));
+	connect(ui.btnTextFont, SIGNAL(clicked()), this, SLOT(on_changeFont_clicked()) );
+	connect(ui.applyButton, SIGNAL(clicked()), this, SLOT(apply_hocr_settings()));
 
 	// set default options for viewing images
 	hocr_pix = NULL;
-	hocr_ocr_type_regular = true;
-	hocr_ocr_type_columns = true;
 	hocr_ocr_type_nikud = true;
-	hocr_ocr_type_table = true;
-	hocr_ocr_type_no_font_recognition = false;
-	hocr_output_just_ocr = false;
 	hocr_output_with_graphics = false;
-	hocr_output_with_debug_text = false;
 	hocr_brightness = 100;
 
 	setWindowTitle( TITLE );
@@ -84,7 +79,6 @@ void MainWindow::createActions()
 	actionSaveText   = new QAction( QIcon(":/src/images/save.png"), tr("Save..."), this );
 	actionZoomIn     = new QAction( QIcon(":/src/images/zoomin.png"), tr("Zoom in"), this );
 	actionZoomOut    = new QAction( QIcon(":/src/images/zoomout.png"), tr("Zoom out"), this );
-	actionChangeFont = new QAction( tr("Change font"), this );
 	actionZoomNormal = new QAction( tr("1:1"), this );
 	actionExit       = new QAction( tr("Quit"), this );
 	actionAbout      = new QAction( tr("About..."), this );
@@ -110,12 +104,11 @@ void MainWindow::createActions()
 	connect( actionExit      , SIGNAL(triggered()), this, SLOT(on_exitButton_clicked()) );
 	connect( actionZoomIn    , SIGNAL(triggered()), this, SLOT(on_zoomInButton_clicked()) );
 	connect( actionZoomOut   , SIGNAL(triggered()), this, SLOT(on_zoomOutButton_clicked()) );
-	connect( actionChangeFont, SIGNAL(triggered()), this, SLOT(on_changeFont_clicked()) );
+// 	connect( actionChangeFont, SIGNAL(triggered()), this, SLOT(on_changeFont_clicked()) );
 	connect( actionZoomNormal, SIGNAL(triggered()), this, SLOT(on_zoomNormalButton_clicked()) );
 	connect( actionAbout     , SIGNAL(triggered()), this, SLOT(on_aboutButton_clicked()) );
 	connect( actionBestFit   , SIGNAL(triggered()), this, SLOT(on_bestFit_clicked()) );
 	connect( actionOptions   , SIGNAL(triggered()), this, SLOT(on_options_clicked()) );
-
 	connect( actionAboutQt   , SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 	// pixmap viewer, is on max aspect mode by default
@@ -141,8 +134,8 @@ void MainWindow::createMenus()
 	menuView->addAction( actionZoomNormal );
 	menuView->addSeparator();
 	menuView->addAction( actionBestFit );
-	menuView->addSeparator();
-	menuView->addAction( actionChangeFont );
+// 	menuView->addSeparator();
+// 	menuView->addAction( actionChangeFont );
 
 	menuHelp = menuBar()->addMenu(tr("&Help"));
 	menuHelp->addAction( actionAbout );
@@ -166,11 +159,11 @@ void MainWindow::createToolbars()
 void MainWindow::on_aboutButton_clicked()
 {
 	QMessageBox::information( 0,
-"About QHOCR 0.7.0", "QHOCR - a Qt4 GUI front end to the HOCR library"
-"<br>Diego Iastrubni &lt;elcuco@kde.org&gt; 2005"
+"About QHOCR 0.8.2", "QHOCR - a Qt4 GUI front end to the HOCR library"
+"<br>Diego Iastrubni &lt;elcuco@kde.org&gt; 2005,2006"
 "<br><br>This application is free software, released under the terms of GPL"
 "read LICENSE.GPL for more intormation."
-"<br>This application uses <b>libhocr 0.7</b> by Kobi Zamir &lt;kzamir@walla.co.il&gt; http://hocr.berlios.de"
+"<br>This application uses <b>libhocr 0.8.2</b> by Kobi Zamir &lt;kzamir@walla.co.il&gt; http://hocr.berlios.de"
 );
 }
 
@@ -205,9 +198,10 @@ void MainWindow::on_saveButton_clicked()
 		return;
 	
 	bool status;
-	if (s.endsWith(".html") || s.endsWith(".htm"))
+	QString s_lower = s.toLower();
+	if (s_lower.endsWith(".html") || s_lower.endsWith(".htm"))
 		status = saveHTML( s, scannedText->toPlainText() );
-	else if (s.endsWith(".utf8"))
+	else if (s_lower.endsWith(".utf8"))
 		status = saveText( s, scannedText->toPlainText(), true );
 	else
 		status = saveText( s, scannedText->toPlainText(), false );
@@ -235,11 +229,17 @@ void MainWindow::on_zoomNormalButton_clicked()
 
 void MainWindow::on_changeFont_clicked()
 {
+	optionsDialog.hide();
 	bool ok;
 	QFont font = QFontDialog::getFont( &ok, scannedText->font(), this );
 
 	if (ok)
-		scannedText->setFont( font );
+	{
+		ui.textFontPreview->setFont( font );
+		ui.textFontPreview->setText( font.family() );
+	}
+	
+	optionsDialog.show();
 }
 
 void MainWindow::on_bestFit_clicked()
@@ -255,15 +255,8 @@ void MainWindow::on_bestFit_clicked()
 
 void MainWindow::on_options_clicked()
 {
-	ui.cbRegular->setChecked(hocr_ocr_type_regular);
-	ui.cbColumns->setChecked(hocr_ocr_type_columns);
 	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
-	ui.cbTable->setChecked(hocr_ocr_type_table);
-	ui.cbNoFont->setChecked(hocr_ocr_type_no_font_recognition);
-
-	ui.cbJustOCR->setChecked(hocr_output_just_ocr);
 	ui.cbGraphics->setChecked(hocr_output_with_graphics);
-	ui.cbDebug->setChecked(hocr_output_with_debug_text);
 
 	ui.sliderBrightness->setValue(hocr_brightness);
 
@@ -275,60 +268,43 @@ void MainWindow::on_options_clicked()
 
 void MainWindow::apply_hocr_settings()
 {
-	hocr_ocr_type_regular       = ui.cbRegular->isChecked();
-	hocr_ocr_type_columns       = ui.cbColumns->isChecked();
-	hocr_ocr_type_nikud         = ui.cbNikud->isChecked();
-	hocr_ocr_type_table         = ui.cbTable->isChecked();
-	hocr_ocr_type_no_font_recognition = ui.cbNoFont->isChecked();
-
-	hocr_output_just_ocr        = ui.cbJustOCR->isChecked();
-	hocr_output_with_graphics   = ui.cbGraphics->isChecked();
-	hocr_output_with_debug_text = ui.cbDebug->isChecked();
-
-	hocr_brightness = ui.sliderBrightness->value();
-
+	hocr_ocr_type_nikud		= ui.cbNikud->isChecked();
+	hocr_output_with_graphics	= ui.cbGraphics->isChecked();
+	hocr_brightness			= ui.sliderBrightness->value();
+	scannedText->setFont( ui.textFontPreview->font() );
+	scannedText->clear();
+	
 	QTimer::singleShot( 0, this, SLOT(doOCR()));
 }
 
 void MainWindow::saveStatus()
 {
 	QSettings settings;
-	settings.setValue( "main/image", imageFilename );
-	settings.setValue( "main/size", size() );
-	settings.setValue( "main/zoom", imageLabel->getZoomFactor() );
-	settings.setValue( "main/bestfit", imageLabel->getBestFit() );
-	settings.setValue( "main/position", pos() );
-	settings.setValue( "main/state", saveState(0) );
-	settings.setValue( "main/font", scannedText->font().toString() );
-	settings.setValue( "hocr-type/regular", hocr_ocr_type_regular );
-	settings.setValue( "hocr-type/columns", hocr_ocr_type_columns );
-	settings.setValue( "hocr-type/nikud", hocr_ocr_type_nikud );
-	settings.setValue( "hocr-type/table", hocr_ocr_type_table );
-	settings.setValue( "hocr-type/font-recognition", hocr_ocr_type_no_font_recognition );
-	settings.setValue( "hocr-output/just-ocr", hocr_output_just_ocr );
+	settings.setValue( "main/image"		, imageFilename );
+	settings.setValue( "main/size"		, size() );
+	settings.setValue( "main/zoom"		, imageLabel->getZoomFactor() );
+	settings.setValue( "main/bestfit"	, imageLabel->getBestFit() );
+	settings.setValue( "main/position"	, pos() );
+	settings.setValue( "main/state"		, saveState(0) );
+	settings.setValue( "main/font"		, scannedText->font().toString() );
+	settings.setValue( "hocr-type/nikud"	, hocr_ocr_type_nikud );
 	settings.setValue( "hocr-output/graphics", hocr_output_with_graphics );
-	settings.setValue( "hocr-output/debug", hocr_output_with_debug_text );
-	settings.setValue( "hocr/brightness", hocr_brightness );
-
+	settings.setValue( "hocr/brightness"	, hocr_brightness );
+	
 	settings.sync();
 }
 
 void MainWindow::loadStatus()
 {
 	QSettings settings;
+	
 	move( settings.value("main/position", QPoint(200, 200)).toPoint() );
 	resize( settings.value("main/size", QSize(400, 400)).toSize() );
 	restoreState( settings.value("main/state").toByteArray() );
 	scannedText->setFont( QFont(settings.value("main/font").toString()) );
 
-	hocr_ocr_type_regular       = settings.value( "hocr-type/regular", true ).toBool();
-	hocr_ocr_type_columns       = settings.value( "hocr-type/columns", true ).toBool();
 	hocr_ocr_type_nikud         = settings.value( "hocr-type/nikud", true  ).toBool();
-	hocr_ocr_type_table         = settings.value( "hocr-type/table", true ).toBool();
-	hocr_ocr_type_no_font_recognition  = settings.value( "hocr-type/font-recognition", false ).toBool();
-	hocr_output_just_ocr        = settings.value( "hocr-output/just-ocr", false ).toBool();
 	hocr_output_with_graphics   = settings.value( "hocr-output/graphics", false ).toBool();
-	hocr_output_with_debug_text = settings.value( "hocr-output/debug", false ).toBool();
 	hocr_brightness             = settings.value( "hocr/brightness", 100).toInt();
 
 	bool bestFit = settings.value("main/bestfit", true).toBool();
@@ -340,6 +316,16 @@ void MainWindow::loadStatus()
 	imageLabel->setZoomFactor( settings.value("main/zoom", "1").toDouble() );
 		
 	viewImage( settings.value( "main/image" ).toString() );
+
+	QString fontName = settings.value("main/font").toString();
+	if (fontName.isEmpty())
+		fontName = ui.textFontPreview->font().toString();
+	QFont font;
+	font.fromString( fontName );
+	
+	ui.textFontPreview->setFont( font );
+	ui.textFontPreview->setText( font.family() );
+	scannedText->setFont( font );
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -429,17 +415,7 @@ void MainWindow::doOCR()
 		
 	hocr_pix->command = 0;
 	hocr_pix->command |= HOCR_COMMAND_OCR;
-	
-// 	if (hocr_ocr_type_regular)
-// 	if (hocr_ocr_type_columns)
-// 	if (hocr_ocr_type_table)
-// 	if (hocr_ocr_type_no_font_recognition)
-// 	if (hocr_output_just_ocr)
-// 	if (hocr_output_with_debug_text)
-	
 	hocr_pix->command |= HOCR_COMMAND_DICT;
-// 	hocr_pix->command |= HOCR_COMMAND_USE_SPACE_FOR_TAB;
-// 	hocr_pix->command |= HOCR_COMMAND_USE_INDENTATION;
 	
 	if (hocr_ocr_type_nikud)
 		hocr_pix->command |= HOCR_COMMAND_NIKUD;
@@ -458,12 +434,21 @@ void MainWindow::doOCR()
 	hocr_pix->brightness    = hocr_brightness;
 
 #if 1
+//	this code calls the hocr functions in a separated thread.
+//	another timer is executed every 50 milli-seconds, and will
+//	update the GUI with the status of the text recognition.
+//	
+//	that timer, will query the thread and if it stopped (the call to
+//	hocr_do_ocr() has ended) the thread object will be deleted.
 	scannedText->clear();
 	hocr_thread = new HOCRThread( hocr_pix, hocr_text );
 	hocr_thread->start();
-	QTimer::singleShot( 0, this, SLOT(doOCR_async()));
 	hocr_timer = startTimer( 50 );
 #else
+//	this code calls the hocr code in a synchronous mode. this will
+//	block the execution of the main thread, and will make the GUI
+//	non responsive for several seconds. 
+//	it's not used now, but it's left as reference/
 	statusBar()->showMessage( "Processing image started..." );
 	hocr_do_ocr (hocr_pix, hocr_text);
 	imageLabel->setImage( scannedImage );

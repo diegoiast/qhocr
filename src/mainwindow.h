@@ -93,17 +93,9 @@ private:
 	Ui::OptionsDialog ui;
 	
 	// hocr options - hocr_ocr_type
-	bool hocr_ocr_type_regular;
-	bool hocr_ocr_type_columns;
 	bool hocr_ocr_type_nikud;
-	bool hocr_ocr_type_table;
-	bool hocr_ocr_type_no_font_recognition;
-
-	// hocr_options - hocr_output;
-	bool hocr_output_just_ocr;
 	bool hocr_output_with_graphics;
-	bool hocr_output_with_debug_text;
-	int hocr_brightness;
+	int  hocr_brightness;
 
 	int hocr_timer;
 	HOCRThread *hocr_thread;
