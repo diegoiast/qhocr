@@ -10,6 +10,7 @@
 #include <QtDebug>
 #include <QThread>
 #include <QTimer>
+#include <QDir>
 
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
@@ -26,7 +27,6 @@ void HOCRThread::run()
 {
 	hocr_do_ocr (pix, text);
 }
-
 
 MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 {
@@ -134,8 +134,6 @@ void MainWindow::createMenus()
 	menuView->addAction( actionZoomNormal );
 	menuView->addSeparator();
 	menuView->addAction( actionBestFit );
-// 	menuView->addSeparator();
-// 	menuView->addAction( actionChangeFont );
 
 	menuHelp = menuBar()->addMenu(tr("&Help"));
 	menuHelp->addAction( actionAbout );
@@ -162,7 +160,8 @@ void MainWindow::on_aboutButton_clicked()
 "About QHOCR 0.8.2", "QHOCR - a Qt4 GUI front end to the HOCR library"
 "<br>Diego Iastrubni &lt;elcuco@kde.org&gt; 2005,2006"
 "<br><br>This application is free software, released under the terms of GPL"
-"read LICENSE.GPL for more intormation."
+"read LICENSE.GPL for more intormation. Newer versions can be found at"
+"http://iglu.org.il/~diego/qhocr/"
 "<br>This application uses <b>libhocr 0.8.2</b> by Kobi Zamir &lt;kzamir@walla.co.il&gt; http://hocr.berlios.de"
 );
 }
@@ -174,14 +173,21 @@ void MainWindow::on_exitButton_clicked()
 
 void MainWindow::on_loadButton_clicked()
 {
+    statusBar()->showMessage("Loading file");
 	QString s = QFileDialog::getOpenFileName(
-                    this,
-                    "Choose a scanned (300dpi) image",
-                    "",
-                    "Images (*.png *.jpg *.jpeg *.bmp *.gif *.pnm *.xpm)");
-	
-	if (s.isEmpty())
+                    NULL,
+                    tr("Choose a scanned (300dpi) image"),
+                    QDir::home().path(), 
+                    tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.pnm *.xpm)"),
+                    NULL,
+                    QFileDialog::DontUseNativeDialog
+    );
+    
+	if (s.isNull())
+    {
+        statusBar()->showMessage("openning aborted", 3000 );
 		return;
+    }
 	
 	viewImage( s );
 }
@@ -370,8 +376,14 @@ void MainWindow::viewImage( QString fileName )
 
 bool MainWindow::saveHTML( QString fileName, QString text )
 {
-	QFile file( ":src/default.html" );
-	file.open(QFile::ReadOnly | QFile::Text);
+	QFile file( ":/src/default.html" );
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+        // no way we get into this code... but still...
+		QMessageBox::critical( this, "Error", "Something could not read the built in template for the HTML document" );
+		return false;
+	}
+	QString html = file.readAll();
 	
 	file.setFileName( fileName );
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -380,7 +392,6 @@ bool MainWindow::saveHTML( QString fileName, QString text )
 		return false;
 	}
 
-	QString html = file.readAll();
 	html = QString(html).arg("File created by QHOCT - a Qt4 GUI for HOCR").arg( text );
 	QTextStream out(&file);
 	out.setCodec(QTextCodec::codecForName("UTF-8"));

@@ -1,3 +1,12 @@
+qhocr (0.8.2)
+  * New HOCR library (official release 0.8.2, with a nimor change)
+  * HOCR can handle tables, nikud, more stable ... 
+  * Added the documentation of HOCR into the src/hocr directory
+  * Configuration is changed in a single window now
+  * HOCR is now called in another thread, and does not block the GUI
+  * Added a local directory for plugins - for win32 binary releases
+  -- Diego Iastrubni <elcuco@kde.org>	Sat, 24 Sep 21:00
+  
 qhocr (0.5.0)
   * New HOCR library, pulled out of SVN 24-sep-2005, V0.5
   * Many regressions reguarding the OCR ;-)

@@ -9,7 +9,10 @@ I would like to thank Kovi for his great work on the library, and making the int
 that they could be ported that easily. I aslo thank him for the initial GUIs, from which I ... learned 
 ... and copied... :)
 
-This app uses libhocr 0.45 staticly. I will update this soon.
+This app uses libhocr 0.8.2 staticly. I will update this soon to dynamically load lihocr.
+
+You can always get the newest version of qhocr from:
+http://iglu.org.il/~diego/qhocr/
 
 - diego
 

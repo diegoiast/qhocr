@@ -14,7 +14,7 @@ rem *
 rem * You only need to change the 2 sets, match the dir where you installed Qt-free and mingw
 rem * If you installed from the installers found on the site, thos variables will not be used. 
 rem * The  values here are just examples, please ovveride them
-set MY_QT_DIR=c:\qt
+set MY_QT_DIR=c:\qt\4.1.1
 set MY_MINGW_DIR=c:\mingw
 
 set MY_APPNAME=qhocr

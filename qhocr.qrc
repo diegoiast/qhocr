@@ -1,6 +1,6 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
-	<qresource>
+	<qresource prefix="/">
 		<file>src/default.html</file>
 		<file>src/images/copy.png</file>
 		<file>src/images/cut.png</file>

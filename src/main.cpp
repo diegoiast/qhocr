@@ -1,5 +1,7 @@
 #include <QApplication>
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QString>
 #include "mainwindow.h"
 
 /**
@@ -16,7 +18,10 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);	
 	app.setOrganizationName("Trolltech");
 	app.setApplicationName("QHOCR");
-
+    
+    QString s = QCoreApplication::applicationDirPath() + "/plugins";
+    app.addLibraryPath( s );
+    
 	QMainWindow *window = new MainWindow;
 	window->show();
 	return app.exec();
