@@ -110,8 +110,7 @@ extern "C"
  @param text_buffer pointer to hocr_text_buffer struct.
  @return new hocr_text_buffer
  */
-	hocr_text_buffer *hocr_text_buffer_copy (const hocr_text_buffer const
-						 *text_buffer);
+	hocr_text_buffer *hocr_text_buffer_copy (const hocr_text_buffer  *text_buffer);
 
 #ifdef WITH_HSPELL
 

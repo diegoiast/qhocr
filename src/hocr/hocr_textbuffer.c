@@ -206,7 +206,7 @@ hocr_text_buffer_add_char (hocr_text_buffer * text_buffer, const char new_char)
 }
 
 hocr_text_buffer *
-hocr_text_buffer_copy (const hocr_text_buffer const *text_buffer)
+hocr_text_buffer_copy (const hocr_text_buffer *text_buffer)
 {
 	hocr_text_buffer *new_text = NULL;
 
