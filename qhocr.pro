@@ -20,8 +20,8 @@ SOURCES	= src/hocr/font_layout.c \
 	src/hocr/page_layout.c \
 	src/main.cpp \
 	src/mainwindow.cpp \
-	src/pixmapviewer.cpp
+	src/pixmapviewer.cpp \
+	src/logger.cpp
 
 FORMS	= src/hocr_options.ui
-HEADERS	= src/mainwindow.h 	src/pixmapviewer.h
-
+HEADERS	= src/mainwindow.h src/pixmapviewer.h src/logger.h

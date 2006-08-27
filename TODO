@@ -7,7 +7,10 @@ whishes
  1) It's time to move lihocr into *.DLL or *.so
  2) PDF input? 
  3) Print? PDF output?
+ 2) make a win32 installer
+ 3) spec, debian dir, etc
  
+
 0.47
 bugs
  1) save and loading of fonts is not perfect (saves familiy, not size+wieght)
