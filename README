@@ -1,17 +1,19 @@
 QHOCR is a front end to hocr by Kobi Zamir.
 
-The GUI compiles and runs on Windows and Linux. It shuold work on Embeded-Linux and Mac.
+The GUI compiles and runs on Windows and Linux. It shuold work on Embeded-Linux
+ and Mac, and probably any other platform supported by Qt4.
 
 How to help?
-See the README in hocr directory. You can also contact Diego Iastrubni <elcuco@kde.org>.
+See the README in hocr directory. You can also contact Diego Iastrubni 
+<elcuco@kde.org>.
 
-I would like to thank Kovi for his great work on the library, and making the intefaces *so* clean,
-that they could be ported that easily. I aslo thank him for the initial GUIs, from which I ... learned
-... and copied... :)
+I would like to thank Kobi for his great work on the library, and making the 
+intefaces *so* clean, that they could be ported that easily. I aslo thank him 
+for the initial GUIs, from which I ... learned ... and copied... :)
 
-This app uses libhocr 0.8.2 staticly. I will update this soon to dynamically load lihocr.
+This app uses libhocr 0.8.2 staticly. 
 You can always get the newest version of qhocr from:
-http://iglu.org.il/~diego/qhocr/
+http://code.google.com/p/qhocr/
 
 - diego
 

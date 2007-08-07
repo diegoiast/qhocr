@@ -75,9 +75,7 @@ private:
 	QAction     *actionExit;
 	QAction     *actionBestFit;
 
-	QToolBar    *tbFile;
-	QToolBar    *tbView;
-	QToolBar    *fileToolBar;
+	QToolBar    *mainToolBar;
 	QMenu       *menuFile;
 	QMenu       *menuView;
 	QMenu       *menuHelp;

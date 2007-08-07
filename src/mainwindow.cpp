@@ -142,27 +142,27 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolbars()
 {
-	tbFile = addToolBar( tr("File operations") );
-	tbFile->setObjectName( "File operations" );
-	tbFile->addAction( actionLoadImage );
-	tbFile->addAction( actionSaveText );
-
-	tbView = addToolBar( tr("Image operations") );
-	tbView->setObjectName( "Image operations" );
-	tbView->addAction( actionZoomIn );
-	tbView->addAction( actionZoomOut );
-// 	tbView->addAction( actionZoomNormal );
+	mainToolBar = addToolBar( tr("Main Toolbar") );
+	mainToolBar->setObjectName( "Main Toolbar" );
+	mainToolBar->addAction( actionLoadImage );
+	mainToolBar->addAction( actionSaveText );
+	mainToolBar->addSeparator();
+	mainToolBar->addAction( actionZoomIn );
+	mainToolBar->addAction( actionZoomOut );
+// 	mainToolBar->addAction( actionZoomNormal );
 }
 
 void MainWindow::on_aboutButton_clicked()
 {
 	QMessageBox::information( 0,
 "About QHOCR 0.8.2", "QHOCR - a Qt4 GUI front end to the HOCR library"
-"<br>Diego Iastrubni &lt;elcuco@kde.org&gt; 2005,2006"
+"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006"
 "<br><br>This application is free software, released under the terms of GPL"
 "read LICENSE.GPL for more intormation. Newer versions can be found at"
-"http://iglu.org.il/~diego/qhocr/"
-"<br>This application uses <b>libhocr 0.8.2</b> by Kobi Zamir &lt;kzamir@walla.co.il&gt; http://hocr.berlios.de"
+" <a href='http://code.google.com/p/qhocr/'>http://code.google.com/p/qhocr/</a> <br>"
+"<br>This application uses <b>libhocr 0.8.2</b> by "
+"Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
+"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>"
 );
 }
 
