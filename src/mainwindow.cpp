@@ -15,7 +15,7 @@
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
 
-#define TITLE "QHOCR 0.8.2"
+#define TITLE "QHOCR 0.8.2-svn"
 
 HOCRThread::HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  )
 {
@@ -30,22 +30,8 @@ void HOCRThread::run()
 
 MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 {
-	createActions();
-	createMenus();
-	createToolbars();
-
-	// main interface
-	statusBar()->showMessage( tr("Welcome - load an image to start"), 5000 );
-	statusBar()->setSizeGripEnabled( true );
-
-	dwTextArea = new QDockWidget("Recognized text");
-	dwTextArea->setObjectName("Recognized text");
-	scannedText = new QTextEdit;
-	dwTextArea->setWidget( scannedText );
-	scannedText->setReadOnly( true );
-	scannedText->setLayoutDirection( Qt::RightToLeft );
-	addDockWidget( Qt::BottomDockWidgetArea, dwTextArea );
-
+	setupUi( this );
+	connect( actionAboutQt   , SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 	imageLabel = new PixmapViewer;
 	scrollArea = new QScrollArea;
 	scrollArea->setBackgroundRole(QPalette::Dark);
@@ -54,9 +40,11 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 //	scrollArea->setLayoutDirection( Qt::RightToLeft );
 	setCentralWidget(scrollArea);
 
+	statusBar()->showMessage( tr("Welcome - load an image to start"), 5000 );
+
 	// non-modal options dialog
 	ui.setupUi(&optionsDialog);
-	connect(ui.btnTextFont, SIGNAL(clicked()), this, SLOT(on_changeFont_clicked()) );
+	connect(ui.btnTextFont, SIGNAL(clicked()), this, SLOT(_on_changeFont_clicked()) );
 	connect(ui.applyButton, SIGNAL(clicked()), this, SLOT(apply_hocr_settings()));
 
 	// set default options for viewing images
@@ -73,126 +61,46 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 //	viewImage( "tests/test3.jpg" );
 }
 
-void MainWindow::createActions()
-{
-	actionLoadImage  = new QAction( QIcon(":/src/images/open.png"), tr("Open..."), this );
-	actionSaveText   = new QAction( QIcon(":/src/images/save.png"), tr("Save..."), this );
-	actionZoomIn     = new QAction( QIcon(":/src/images/zoomin.png"), tr("Zoom in"), this );
-	actionZoomOut    = new QAction( QIcon(":/src/images/zoomout.png"), tr("Zoom out"), this );
-	actionZoomNormal = new QAction( tr("1:1"), this );
-	actionExit       = new QAction( tr("Quit"), this );
-	actionAbout      = new QAction( tr("About..."), this );
-	actionBestFit    = new QAction( tr("Best fit"), this );
-	actionAboutQt    = new QAction(tr("About &Qt"), this);
-	actionOptions    = new QAction(tr("HOCR &Preferences"), this);
-
-	actionLoadImage ->setShortcut(tr("Ctrl+O"));
-	actionSaveText  ->setShortcut(tr("Ctrl+S"));
-	actionZoomIn    ->setShortcut(tr("Ctrl++"));
-	actionZoomOut   ->setShortcut(tr("Ctrl+-"));
-	actionZoomNormal->setShortcut(tr("Ctrl+="));
-	actionExit      ->setShortcut(tr("Ctrl+Q"));
-	actionOptions   ->setShortcut(tr("Ctrl+H"));
-	actionBestFit   ->setShortcut(tr("Ctrl+A"));
-	actionBestFit   ->setCheckable( true );
-	actionBestFit   ->setChecked(false);
-
-	actionAboutQt->setStatusTip(tr("Show the Qt library's About box"));
-	
-	connect( actionLoadImage , SIGNAL(triggered()), this, SLOT(on_loadButton_clicked()) );
-	connect( actionSaveText  , SIGNAL(triggered()), this, SLOT(on_saveButton_clicked()) );
-	connect( actionExit      , SIGNAL(triggered()), this, SLOT(on_exitButton_clicked()) );
-	connect( actionZoomIn    , SIGNAL(triggered()), this, SLOT(on_zoomInButton_clicked()) );
-	connect( actionZoomOut   , SIGNAL(triggered()), this, SLOT(on_zoomOutButton_clicked()) );
-// 	connect( actionChangeFont, SIGNAL(triggered()), this, SLOT(on_changeFont_clicked()) );
-	connect( actionZoomNormal, SIGNAL(triggered()), this, SLOT(on_zoomNormalButton_clicked()) );
-	connect( actionAbout     , SIGNAL(triggered()), this, SLOT(on_aboutButton_clicked()) );
-	connect( actionBestFit   , SIGNAL(triggered()), this, SLOT(on_bestFit_clicked()) );
-	connect( actionOptions   , SIGNAL(triggered()), this, SLOT(on_options_clicked()) );
-	connect( actionAboutQt   , SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-
-	// pixmap viewer, is on max aspect mode by default
-	actionZoomNormal->setEnabled( false );
-	actionZoomIn->setEnabled( false );
-	actionZoomOut->setEnabled( false );
-	actionZoomNormal->setEnabled( false );
-}
-
-void MainWindow::createMenus()
-{
-	menuFile = menuBar()->addMenu(tr("&File"));
-	menuFile->addAction( actionLoadImage );
-	menuFile->addAction( actionSaveText );
-	menuFile->addSeparator();
-	menuFile->addAction( actionOptions );
-	menuFile->addSeparator();
-	menuFile->addAction( actionExit );
-
-	menuView = menuBar()->addMenu(tr("&View"));
-	menuView->addAction( actionZoomIn );
-	menuView->addAction( actionZoomOut );
-	menuView->addAction( actionZoomNormal );
-	menuView->addSeparator();
-	menuView->addAction( actionBestFit );
-
-	menuHelp = menuBar()->addMenu(tr("&Help"));
-	menuHelp->addAction( actionAbout );
-	menuHelp->addAction( actionAboutQt );
-}
-
-void MainWindow::createToolbars()
-{
-	mainToolBar = addToolBar( tr("Main Toolbar") );
-	mainToolBar->setObjectName( "Main Toolbar" );
-	mainToolBar->addAction( actionLoadImage );
-	mainToolBar->addAction( actionSaveText );
-	mainToolBar->addSeparator();
-	mainToolBar->addAction( actionZoomIn );
-	mainToolBar->addAction( actionZoomOut );
-// 	mainToolBar->addAction( actionZoomNormal );
-}
-
-void MainWindow::on_aboutButton_clicked()
+void MainWindow::on_actionAbout_triggered()
 {
 	QMessageBox::information( 0,
-"About QHOCR 0.8.2", "QHOCR - a Qt4 GUI front end to the HOCR library"
-"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006"
-"<br><br>This application is free software, released under the terms of GPL"
-"read LICENSE.GPL for more intormation. Newer versions can be found at"
-" <a href='http://code.google.com/p/qhocr/'>http://code.google.com/p/qhocr/</a> <br>"
-"<br>This application uses <b>libhocr 0.8.2</b> by "
-"Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
-"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>"
-);
+		"About QHOCR 0.8.2", "QHOCR - a Qt4 GUI front end to the HOCR library"
+		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006"
+		"<br><br>This application is free software, released under the terms of GPL"
+		"read LICENSE.GPL for more intormation. Newer versions can be found at"
+		" <a href='http://code.google.com/p/qhocr/'>http://code.google.com/p/qhocr/</a> <br>"
+		"<br>This application uses <b>libhocr 0.8.2</b> by "
+		"Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
+		"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>"
+	);
 }
 
-void MainWindow::on_exitButton_clicked()
+void MainWindow::on_action_Quit_triggered()
 {
 	QApplication::exit(0);
 }
 
-void MainWindow::on_loadButton_clicked()
+void MainWindow::on_action_Open_triggered()
 {
-    statusBar()->showMessage("Loading file");
+	statusBar()->showMessage("Loading file");
 	QString s = QFileDialog::getOpenFileName(
-                    NULL,
-                    tr("Choose a scanned (300dpi) image"),
-                    QDir::home().path(), 
-                    tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.pnm *.xpm)"),
-                    NULL,
-                    QFileDialog::DontUseNativeDialog
-    );
-    
+		NULL,
+		tr("Choose a scanned (300dpi) image"),
+		QDir::home().path(), 
+		tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.pnm *.xpm)"),
+		NULL
+	);
+	
 	if (s.isNull())
-    {
-        statusBar()->showMessage("openning aborted", 3000 );
+	{
+		statusBar()->showMessage("openning aborted", 3000 );
 		return;
-    }
+	}
 	
 	viewImage( s );
 }
 
-void MainWindow::on_saveButton_clicked()
+void MainWindow::on_action_Save_triggered()
 {
 	QString s = QFileDialog::getSaveFileName(
                     this,
@@ -218,22 +126,22 @@ void MainWindow::on_saveButton_clicked()
 		statusBar()->showMessage( tr("An error occured while saving the text"), 5000 );
 }
 
-void MainWindow::on_zoomInButton_clicked()
+void MainWindow::on_actionZoomIn_triggered()
 {
 	imageLabel->zoomBy( 1.1 );
 }
 
-void MainWindow::on_zoomOutButton_clicked()
+void MainWindow::on_actionZoomOut_triggered()
 {
 	imageLabel->zoomBy( 1 / 1.1 );
 }
 
-void MainWindow::on_zoomNormalButton_clicked()
+void MainWindow::on_actionZoomNormal_triggered()
 {
 	imageLabel->zoomBy( 0 );
 }
 
-void MainWindow::on_changeFont_clicked()
+void MainWindow::_on_changeFont_clicked()
 {
 	optionsDialog.hide();
 	bool ok;
@@ -248,7 +156,7 @@ void MainWindow::on_changeFont_clicked()
 	optionsDialog.show();
 }
 
-void MainWindow::on_bestFit_clicked()
+void MainWindow::on_actionBestFit_triggered()
 {
 	bool b = imageLabel->getBestFit();
 	imageLabel->setBestFit( !b );
@@ -259,7 +167,7 @@ void MainWindow::on_bestFit_clicked()
 	actionZoomNormal->setEnabled( b );
 }
 
-void MainWindow::on_options_clicked()
+void MainWindow::on_actionHOCR_Preferences_triggered()
 {
 	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
 	ui.cbGraphics->setChecked(hocr_output_with_graphics);
@@ -334,13 +242,10 @@ void MainWindow::loadStatus()
 	scannedText->setFont( font );
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent *)
 {
 	optionsDialog.hide();
 	saveStatus();
-
-	// ugly hack to shut up warnings...
-	event = 0;
 }
 
 void MainWindow::viewImage( QString fileName )
@@ -379,7 +284,7 @@ bool MainWindow::saveHTML( QString fileName, QString text )
 	QFile file( ":/src/default.html" );
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-        // no way we get into this code... but still...
+		// no way we get into this code... but still...
 		QMessageBox::critical( this, "Error", "Something could not read the built in template for the HTML document" );
 		return false;
 	}
@@ -392,7 +297,7 @@ bool MainWindow::saveHTML( QString fileName, QString text )
 		return false;
 	}
 
-	html = QString(html).arg("File created by QHOCT - a Qt4 GUI for HOCR").arg( text );
+	html = QString(html).arg("File created by QHOCR - a Qt4 GUI for HOCR").arg( text );
 	QTextStream out(&file);
 	out.setCodec(QTextCodec::codecForName("UTF-8"));
 	out << html;
@@ -459,7 +364,7 @@ void MainWindow::doOCR()
 //	this code calls the hocr code in a synchronous mode. this will
 //	block the execution of the main thread, and will make the GUI
 //	non responsive for several seconds. 
-//	it's not used now, but it's left as reference/
+//	it's not used now, but it's left as reference
 	statusBar()->showMessage( "Processing image started..." );
 	hocr_do_ocr (hocr_pix, hocr_text);
 	imageLabel->setImage( scannedImage );

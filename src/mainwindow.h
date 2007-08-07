@@ -17,6 +17,7 @@
 #include "hocr.h"
 #include "pixmapviewer.h"
 #include "ui_hocr_options.h"
+#include "ui_qhocr_mainwin.h"
 
 class HOCRThread: public QThread
 {
@@ -29,31 +30,28 @@ private:
 	hocr_text_buffer *text;
 };
 
-class MainWindow: public QMainWindow
+class MainWindow: public QMainWindow, public Ui::qhocrMainWindow 
 {
 	Q_OBJECT
 
 public:
 	MainWindow( QWidget *parent=0 );
-	void createActions();
-	void createMenus();
-	void createToolbars();
 
 public slots:
-	void on_aboutButton_clicked();
-	void on_exitButton_clicked();
-	void on_loadButton_clicked();
-	void on_saveButton_clicked();
-	void on_zoomInButton_clicked();
-	void on_zoomOutButton_clicked();
-	void on_zoomNormalButton_clicked();
-	void on_changeFont_clicked();
-	void on_bestFit_clicked();
-	void on_options_clicked();
+	void on_actionAbout_triggered();
+	void on_action_Quit_triggered();
+	void on_action_Open_triggered();
+	void on_action_Save_triggered();
+	void on_actionZoomIn_triggered();
+	void on_actionZoomOut_triggered();
+	void on_actionZoomNormal_triggered();
+	void _on_changeFont_clicked();
+	void on_actionBestFit_triggered();
+	void on_actionHOCR_Preferences_triggered();
 	void apply_hocr_settings();
 	void saveStatus();
 	void loadStatus();
-	void closeEvent(QCloseEvent *event);
+	void closeEvent(QCloseEvent *);
 	
 	void doOCR();
 	virtual void timerEvent(QTimerEvent *event);
@@ -62,25 +60,6 @@ private:
 	void viewImage( QString fileName );
 	bool saveHTML( QString fileName, QString text );
 	bool saveText( QString fileName, QString text, bool unicode );
-
-	QAction     *actionAbout;
-	QAction     *actionAboutQt;
-	QAction     *actionLoadImage;
-	QAction     *actionSaveText;
-	QAction     *actionZoomIn;
-	QAction     *actionZoomOut;
-	QAction     *actionZoomNormal;
-	QAction     *actionChangeFont;
-	QAction     *actionOptions;
-	QAction     *actionExit;
-	QAction     *actionBestFit;
-
-	QToolBar    *mainToolBar;
-	QMenu       *menuFile;
-	QMenu       *menuView;
-	QMenu       *menuHelp;
-	QDockWidget *dwTextArea;
-	QTextEdit   *scannedText;	
 	PixmapViewer *imageLabel;
 	QScrollArea  *scrollArea;
 
