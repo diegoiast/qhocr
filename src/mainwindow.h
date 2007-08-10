@@ -1,23 +1,17 @@
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 
-#include <QMainWindow>
-#include <QMenu>
-#include <QMenuBar>
-#include <QAction>
-#include <QToolBar>
-#include <QLabel>
-#include <QScrollArea>
-#include <QDockWidget>
-#include <QStatusBar>
-#include <QTextEdit>
-#include <QPixmap>
 #include <QThread>
 
 #include "hocr.h"
 #include "pixmapviewer.h"
 #include "ui_hocr_options.h"
 #include "ui_qhocr_mainwin.h"
+
+class QImage;
+class QString;
+class QDialog;
+class QScrollArea;
 
 class HOCRThread: public QThread
 {
@@ -54,7 +48,7 @@ public slots:
 	void closeEvent(QCloseEvent *);
 	
 	void doOCR();
-	virtual void timerEvent(QTimerEvent *event);
+	virtual void timerEvent(QTimerEvent *);
 
 private:
 	void viewImage( QString fileName );

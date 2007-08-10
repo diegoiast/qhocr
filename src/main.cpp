@@ -1,11 +1,10 @@
 #include <QApplication>
 #include <QMainWindow>
-#include <QMessageBox>
 #include <QString>
 #include "mainwindow.h"
 
 /**
- * \brief Entry point of the application
+ * \brief Entry point of the qhocr application
  * \arg argc Needed for compability
  * \arg argv Needed for compability
  *
@@ -19,8 +18,8 @@ int main(int argc, char *argv[])
 	app.setOrganizationName("Trolltech");
 	app.setApplicationName("QHOCR");
     
-    QString s = QCoreApplication::applicationDirPath() + "/plugins";
-    app.addLibraryPath( s );
+	QString s = QCoreApplication::applicationDirPath() + "/plugins";
+	app.addLibraryPath( s );
     
 	QMainWindow *window = new MainWindow;
 	window->show();

@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QScrollArea>
 #include <QMessageBox>
 #include <QPixmap>
 #include <QFileDialog>
@@ -11,6 +12,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QDir>
+//#include <QFileInfo >
 
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
@@ -57,8 +59,6 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	hocr_timer = 0;
 	hocr_thread = NULL;
 	loadStatus();
-	
-//	viewImage( "tests/test3.jpg" );
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -83,12 +83,17 @@ void MainWindow::on_action_Quit_triggered()
 void MainWindow::on_action_Open_triggered()
 {
 	statusBar()->showMessage("Loading file");
+	QFileInfo info(imageFilename);
+	QString lastDir = info.absolutePath();
+	
+	if (lastDir.isEmpty())
+		lastDir = QDir::home().path();
+
 	QString s = QFileDialog::getOpenFileName(
-		NULL,
+		this,
 		tr("Choose a scanned (300dpi) image"),
-		QDir::home().path(), 
-		tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.pnm *.xpm)"),
-		NULL
+		lastDir, 
+		tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.pnm *.xpm)")
 	);
 	
 	if (s.isNull())
@@ -102,17 +107,37 @@ void MainWindow::on_action_Open_triggered()
 
 void MainWindow::on_action_Save_triggered()
 {
+	static QString sf;
+	static QString lastSave;
+	QFileInfo info(lastSave);
+	QString lastDir = info.absolutePath();
+
+	if (lastDir.isEmpty())
+		lastDir = QDir::home().path();
+	
 	QString s = QFileDialog::getSaveFileName(
-                    this,
-                    "Choose a file to save to",
-                    "",
-                    "Text files (*.txt *.utf8 *.html *.htm)");
+		this,
+		"Choose a file to save to",
+		lastDir,
+		"Text files (*.txt *.utf8);; HTML Files (*.html *.htm)",
+		&sf
+	);
 
 	if (s.isEmpty())
 		return;
 	
 	bool status;
 	QString s_lower = s.toLower();
+	
+	// what if the users did not specify a suffix...?
+	QFileInfo f( s );
+	if (f.suffix().isEmpty())
+	{
+		// waiting for ideas from:
+		// http://www.qtcentre.org/forum/f-qt-programming-2/t-qfiledialoggetsavefilename-default-extension-8503.html
+		qDebug("no suffix, adding %s", qPrintable( sf ) );
+	}
+	
 	if (s_lower.endsWith(".html") || s_lower.endsWith(".htm"))
 		status = saveHTML( s, scannedText->toPlainText() );
 	else if (s_lower.endsWith(".utf8"))
@@ -121,7 +146,10 @@ void MainWindow::on_action_Save_triggered()
 		status = saveText( s, scannedText->toPlainText(), false );
 
 	if (status)
+	{
 		statusBar()->showMessage( tr("Text saved"), 5000 );
+		lastSave = s;
+	}
 	else
 		statusBar()->showMessage( tr("An error occured while saving the text"), 5000 );
 }
@@ -377,7 +405,7 @@ void MainWindow::doOCR()
 #endif
 }
 
-void MainWindow::timerEvent(QTimerEvent *event)
+void MainWindow::timerEvent(QTimerEvent *)
 {
 	if (hocr_pix == NULL)
 		return;
@@ -402,7 +430,4 @@ void MainWindow::timerEvent(QTimerEvent *event)
 		delete hocr_thread;
 		hocr_thread = NULL;
 	}
-	
-	// ugly hack to shut up warnings
-	event = 0;
 }
