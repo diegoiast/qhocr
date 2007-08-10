@@ -18,6 +18,7 @@
 #include "ui_hocr_options.h"
 
 #define TITLE "QHOCR 0.8.2-svn"
+#define MESSAGE_TIME 5000
 
 HOCRThread::HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  )
 {
@@ -42,7 +43,7 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 //	scrollArea->setLayoutDirection( Qt::RightToLeft );
 	setCentralWidget(scrollArea);
 
-	statusBar()->showMessage( tr("Welcome - load an image to start"), 5000 );
+	statusBar()->showMessage( tr("Welcome - load an image to start"), MESSAGE_TIME );
 
 	// non-modal options dialog
 	ui.setupUi(&optionsDialog);
@@ -59,19 +60,34 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	hocr_timer = 0;
 	hocr_thread = NULL;
 	loadStatus();
+
+	// I don't really like this code, but I have no other alternative, read:
+	// http://www.qtcentre.org/forum/f-qt-programming-2/t-qfiledialoggetsavefilename-default-extension-8503.html
+	extByMessage[ tr("Text files (*.txt *.utf8)") ] = ".txt";
+	extByMessage[ tr("HTML Files (*.html *.htm)") ] = ".html";
+	
+	QHashIterator<QString, QString> i(extByMessage);
+ 	while (i.hasNext()) 
+ 	{
+ 		i.next();
+ 		saveMessage += i.key();
+ 		if (i.hasNext()) 
+ 			saveMessage += ";;";
+	}
 }
 
 void MainWindow::on_actionAbout_triggered()
 {
 	QMessageBox::information( 0,
-		"About QHOCR 0.8.2", "QHOCR - a Qt4 GUI front end to the HOCR library"
+		tr("About QHOCR 0.8.2"), 
+		tr("QHOCR - a Qt4 GUI front end to the HOCR library"
 		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006"
 		"<br><br>This application is free software, released under the terms of GPL"
 		"read LICENSE.GPL for more intormation. Newer versions can be found at"
 		" <a href='http://code.google.com/p/qhocr/'>http://code.google.com/p/qhocr/</a> <br>"
 		"<br>This application uses <b>libhocr 0.8.2</b> by "
 		"Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
-		"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>"
+		"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>")
 	);
 }
 
@@ -82,7 +98,7 @@ void MainWindow::on_action_Quit_triggered()
 
 void MainWindow::on_action_Open_triggered()
 {
-	statusBar()->showMessage("Loading file");
+	statusBar()->showMessage( tr("Loading file") );
 	QFileInfo info(imageFilename);
 	QString lastDir = info.absolutePath();
 	
@@ -98,7 +114,7 @@ void MainWindow::on_action_Open_triggered()
 	
 	if (s.isNull())
 	{
-		statusBar()->showMessage("openning aborted", 3000 );
+		statusBar()->showMessage( tr("openning aborted"), MESSAGE_TIME );
 		return;
 	}
 	
@@ -117,9 +133,9 @@ void MainWindow::on_action_Save_triggered()
 	
 	QString s = QFileDialog::getSaveFileName(
 		this,
-		"Choose a file to save to",
+		tr("Choose a file to save to"),
 		lastDir,
-		"Text files (*.txt *.utf8);; HTML Files (*.html *.htm)",
+		saveMessage,
 		&sf
 	);
 
@@ -127,16 +143,16 @@ void MainWindow::on_action_Save_triggered()
 		return;
 	
 	bool status;
-	QString s_lower = s.toLower();
 	
 	// what if the users did not specify a suffix...?
 	QFileInfo f( s );
 	if (f.suffix().isEmpty())
 	{
-		// waiting for ideas from:
 		// http://www.qtcentre.org/forum/f-qt-programming-2/t-qfiledialoggetsavefilename-default-extension-8503.html
-		qDebug("no suffix, adding %s", qPrintable( sf ) );
+		s += extByMessage[sf];
 	}
+
+	QString s_lower = s.toLower();
 	
 	if (s_lower.endsWith(".html") || s_lower.endsWith(".htm"))
 		status = saveHTML( s, scannedText->toPlainText() );
@@ -147,11 +163,11 @@ void MainWindow::on_action_Save_triggered()
 
 	if (status)
 	{
-		statusBar()->showMessage( tr("Text saved"), 5000 );
+		statusBar()->showMessage( tr("Text saved"), MESSAGE_TIME );
 		lastSave = s;
 	}
 	else
-		statusBar()->showMessage( tr("An error occured while saving the text"), 5000 );
+		statusBar()->showMessage( tr("An error occured while saving the text"), MESSAGE_TIME );
 }
 
 void MainWindow::on_actionZoomIn_triggered()
@@ -313,7 +329,10 @@ bool MainWindow::saveHTML( QString fileName, QString text )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		// no way we get into this code... but still...
-		QMessageBox::critical( this, "Error", "Something could not read the built in template for the HTML document" );
+		QMessageBox::critical( this, 
+			tr("Error"), 
+			tr("Something could not read the built in template for the HTML document") 
+		);
 		return false;
 	}
 	QString html = file.readAll();
@@ -321,11 +340,11 @@ bool MainWindow::saveHTML( QString fileName, QString text )
 	file.setFileName( fileName );
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		QMessageBox::critical( this, "Error", "Cound not save file" );
+		QMessageBox::critical( this, tr("Error"), tr("Cound not save file") );
 		return false;
 	}
 
-	html = QString(html).arg("File created by QHOCR - a Qt4 GUI for HOCR").arg( text );
+	html = QString(html).arg( tr("File created by QHOCR - a Qt4 GUI for HOCR") ).arg( text );
 	QTextStream out(&file);
 	out.setCodec(QTextCodec::codecForName("UTF-8"));
 	out << html;
@@ -339,7 +358,7 @@ bool MainWindow::saveText( QString fileName, QString text, bool unicode )
 	
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		QMessageBox::critical( this, "Error", "Cound not save file" );
+		QMessageBox::critical( this, tr("Error"), tr("Cound not save file") );
 		return false;
 	}
 
@@ -393,7 +412,7 @@ void MainWindow::doOCR()
 //	block the execution of the main thread, and will make the GUI
 //	non responsive for several seconds. 
 //	it's not used now, but it's left as reference
-	statusBar()->showMessage( "Processing image started..." );
+	statusBar()->showMessage( tr("Processing image started...") );
 	hocr_do_ocr (hocr_pix, hocr_text);
 	imageLabel->setImage( scannedImage );
 	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
@@ -401,7 +420,7 @@ void MainWindow::doOCR()
 	hocr_pixbuf_unref( hocr_pix );
 	hocr_text_buffer_unref( hocr_text );
 	hocr_pix = NULL;
-	statusBar()->showMessage( "Processing image done", 5000 );
+	statusBar()->showMessage( tr("Processing image done"), MESSAGE_TIME );
 #endif
 }
 
@@ -411,7 +430,7 @@ void MainWindow::timerEvent(QTimerEvent *)
 		return;
 
 	int percentage = (int)(100*(hocr_pix->progress+2)/256.);
-	statusBar()->showMessage( QString("Processing image: %1%").arg(percentage), 3000 );
+	statusBar()->showMessage( tr("Processing image: %1%").arg(percentage), MESSAGE_TIME );
 	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
 
 	if (hocr_thread->isFinished())
@@ -423,7 +442,7 @@ void MainWindow::timerEvent(QTimerEvent *)
 		hocr_pixbuf_unref( hocr_pix );
 		hocr_text_buffer_unref( hocr_text );
 		hocr_pix = NULL;
-		statusBar()->showMessage( "Processing image done", 5000 );
+		statusBar()->showMessage( tr("Processing image done"), MESSAGE_TIME );
 
 		killTimer( hocr_timer );
 		hocr_timer = 0;

@@ -2,6 +2,7 @@
 #define __MAIN_WINDOW_H__
 
 #include <QThread>
+#include <QHash>
 
 #include "hocr.h"
 #include "pixmapviewer.h"
@@ -62,6 +63,10 @@ private:
 	QString      imageFilename;
 	QDialog      optionsDialog;
 	Ui::OptionsDialog ui;
+	
+	// this is *so* lame
+	QString saveMessage;
+	QHash<QString,QString> extByMessage;
 	
 	// hocr options - hocr_ocr_type
 	bool hocr_ocr_type_nikud;
