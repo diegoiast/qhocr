@@ -1,6 +1,6 @@
 TARGET = qhocr-cli
 TEMPLATE = app
-QT = core \
+QT = debug core \
     gui
 DESTDIR = bin
 TMP_DIR = .tmp

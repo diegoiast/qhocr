@@ -8,11 +8,20 @@ class QHOCRThread : public QThread{
 	Q_OBJECT
 public:
 	QHOCRThread( QString );
+	virtual void run();
 	
-	void run();
+	void doOCR();
+	void usleep(unsigned int);
+	
+	int getProcess(){ return mHOCR_progress; };
+	
 private:
 	QString mFileName;
-	QImage mImage;
+	QImage  mImage;
+	
+	void*   mHOCR_pixbuf;
+	void*   mHOCR_text;
+	int     mHOCR_progress;
 };
 
 
