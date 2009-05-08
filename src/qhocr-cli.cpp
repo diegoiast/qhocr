@@ -2,40 +2,34 @@
 #include <QTimer>
 #include <QTime>
 #include <QDebug>
-
 #include "qhocrthread.h"
-
 
 int main( int argc, char *argv[] )
 {
 	QCoreApplication app(argc,argv);
+//	QHOCRThread hocr("/home/elcuco/src/qhocr/tests/bible-01-small_print.jpg");
+	QHOCRThread hocr("/home/elcuco/src/qhocr/tests/test6.jpg");
 	
-	QHOCRThread hocr("/home/elcuco/src/qhocr/tests/bible-01-small_print.jpg");
-//	hocr.run();
-//	hocr.start();
-	hocr.doOCR();
+	hocr.mHOCR_font_options.font_code = 1;
 	
+	hocr.doOCR(); // just calls QThread::start();
+	const int MAX_TIME = 60*3; // in seconds
 	QTime t;
 	t.start();
-	
 	while (hocr.isRunning())
 	{
-		hocr.usleep( 50 );
-		
+		hocr.usleep( 250 );
 		if ( (t.elapsed() % 1000) == 0)
-			qDebug() << t.elapsed() << hocr.getProcess();
-		
-		
-		// idle loop;
-		if (t.elapsed() > 15000){
-			hocr.exit();
-			qDebug("Watch dog working - the process took more then 5 seconds");
+			qDebug( "Process after %dsec: %d%% at stage %d", t.elapsed()/1000, hocr.getProcess(), hocr.getStage() );
+		if (t.elapsed() > MAX_TIME * 1000){
+			hocr.terminate();
+			hocr.quit();
+			qDebug("Watch dog working - the process took more then %d seconds", MAX_TIME );
 			break;
 		}
 	}
 	
-	
-	qDebug("Hello world");
-	return app.exec();
+	qDebug() << "Found string:" << hocr.getString();
+	qDebug("End of application");
+//	return app.exec();
 }
-
