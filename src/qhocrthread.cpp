@@ -49,7 +49,6 @@ void QHOCRThread::run()
 	}
 	
 	// phase 2 - layout analysis
-	sleep(3);
 	qDebug( "Stage 2 - memory: %d", getMemSize() );
 	mStage	= HOCR_STAGES::layoutAnalysis;
 	ho_layout *page = hocr_layout_analysis ( bitmap,
@@ -68,7 +67,6 @@ void QHOCRThread::run()
 	}
 	
 	// phase 3 - font recognition
-	sleep(3);
 	qDebug( "Stage 3 - memory: %d", getMemSize() );
 	mStage	= HOCR_STAGES::fontRecognition;
 	ho_string *text = ho_string_new();
@@ -86,7 +84,8 @@ void QHOCRThread::run()
 		((ho_string*) (text))->size
 	);
 	mStage	= HOCR_STAGES::idle;
-	
+
+	ho_layout_free(page);
 	ho_pixbuf_free(pixbuf);
 	ho_bitmap_free(bitmap);
 	ho_string_free(text);
