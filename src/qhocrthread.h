@@ -5,29 +5,29 @@
 #include <QImage>
 
 typedef struct HOCR_IMAGE_OPTIONS{
-	const unsigned char scale;
-	const unsigned char no_auto_scale;
+	unsigned char scale;
+	unsigned char no_auto_scale;
 	double rotate;
-	const unsigned char no_auto_rotate;
-	const unsigned char adaptive;
-	const unsigned char threshold;
-	const unsigned char a_threshold;
+	unsigned char no_auto_rotate;
+	unsigned char adaptive;
+	unsigned char threshold;
+	unsigned char a_threshold;
 } HOCR_IMAGE_OPTIONS;
 
 typedef struct HOCR_LAYOUT_OPTIONS {
-	const int font_spacing_code;
-	const int paragraph_setup;
-	const int slicing_threshold;
-	const int slicing_width;
-	const unsigned char dir_ltr;
-	const unsigned char html;
+	int font_spacing_code;
+	int paragraph_setup;
+	int slicing_threshold;
+	int slicing_width;
+	unsigned char dir_ltr;
+	unsigned char html;
 } HOCR_OPTIONS;
 
 typedef struct HOCR_FONT_OPTIONS {
 	int font_code;
-	const unsigned char html;
-	const unsigned char nikud;
-	const unsigned char do_linguistics;
+	unsigned char html;
+	unsigned char nikud;
+	unsigned char do_linguistics;
 } HOCR_FONT_OPTIONS;
 
 

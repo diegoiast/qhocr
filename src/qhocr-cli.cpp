@@ -19,7 +19,7 @@ int main( int argc, char *argv[] )
 	while (hocr.isRunning())
 	{
 		hocr.usleep( 250 );
-		if ( (t.elapsed() % 1000) == 0)
+		if ( (t.elapsed() % 5000) == 0)
 			qDebug( "Process after %dsec: %d%% at stage %d", t.elapsed()/1000, hocr.getProcess(), hocr.getStage() );
 		if (t.elapsed() > MAX_TIME * 1000){
 			hocr.terminate();
@@ -29,7 +29,8 @@ int main( int argc, char *argv[] )
 		}
 	}
 	
-	qDebug() << "Found string:" << hocr.getString();
+	qDebug() << "Memory used: " << getMemSize() << "kb";
+	qDebug() << "Process took:" << t.elapsed() << " Found string:" << hocr.getString() ;
 	qDebug("End of application");
 //	return app.exec();
 }

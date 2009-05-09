@@ -15,10 +15,32 @@ QHOCRThread::QHOCRThread( QString fileName )
 	
 	mHOCR_progress = 0;
 	mStage         = HOCR_STAGES::idle;
+	
+	mHOCR_image_options.scale		= 0;
+	mHOCR_image_options.no_auto_scale	= 0;
+	mHOCR_image_options.rotate		= 0x00;
+	mHOCR_image_options.no_auto_rotate	= 0;
+	mHOCR_image_options.adaptive		= 0;
+	mHOCR_image_options.threshold		= 0;
+	mHOCR_image_options.a_threshold		= 0;
+	
+	mHOCR_layout_options.font_spacing_code	= 0;
+	mHOCR_layout_options.paragraph_setup	= 0;
+	mHOCR_layout_options.slicing_threshold	= 0;
+	mHOCR_layout_options.slicing_width	= 0;
+	mHOCR_layout_options.dir_ltr		= 0;
+	mHOCR_layout_options.html		= 1;
+
+	mHOCR_font_options.font_code		= 0;
+	mHOCR_font_options.html			= 1;
+	mHOCR_font_options.nikud		= 1;
+	mHOCR_font_options.do_linguistics	= 0;
 }
 
+// CHANGE THIS TO 0 to use the other version
 #if 1
-void QHOCRThread::run()
+// not working, the returned text is not recognized, I see only "*"
+void QHOCRThread::run() 
 {
 	if (mStage != HOCR_STAGES::idle){
 		// this means another thread is running....
@@ -29,7 +51,6 @@ void QHOCRThread::run()
 	mParsedText.clear();
 	
 	// phase 1 - image pre-processing
-	qDebug( "Stage 1 - memory: %d", getMemSize() );
 	mStage	= HOCR_STAGES::imagePreProces;
 	ho_pixbuf *pixbuf  = (ho_pixbuf*)getPixbufFromQImage( &mImage );
 	ho_bitmap *bitmap = hocr_image_processing( pixbuf,
@@ -49,7 +70,6 @@ void QHOCRThread::run()
 	}
 	
 	// phase 2 - layout analysis
-	qDebug( "Stage 2 - memory: %d", getMemSize() );
 	mStage	= HOCR_STAGES::layoutAnalysis;
 	ho_layout *page = hocr_layout_analysis ( bitmap,
 		mHOCR_layout_options.font_spacing_code,
@@ -67,7 +87,6 @@ void QHOCRThread::run()
 	}
 	
 	// phase 3 - font recognition
-	qDebug( "Stage 3 - memory: %d", getMemSize() );
 	mStage	= HOCR_STAGES::fontRecognition;
 	ho_string *text = ho_string_new();
 	int return_val = hocr_font_recognition( page, 
@@ -89,11 +108,14 @@ void QHOCRThread::run()
 	ho_pixbuf_free(pixbuf);
 	ho_bitmap_free(bitmap);
 	ho_string_free(text);
-	quit();
+	exit(return_val);
 }
 #else
+// working, but no control
 void QHOCRThread::run()
 {
+	mStage	= HOCR_STAGES::fontRecognition;
+	
 	// note how ugly C is, as I could not forward declard ho_pixbuf and
 	// had to use a typecast...
 	ho_string *mHOCR_text    = (ho_string *)ho_string_new();
@@ -118,6 +140,7 @@ void QHOCRThread::run()
 	free(mHOCR_pixbuf);
 	mHOCR_text   = NULL;
 	mHOCR_pixbuf = NULL;
+	mStage	= HOCR_STAGES::idle;
 	
 	quit();
 }
@@ -133,14 +156,6 @@ void * QHOCRThread::getPixbufFromQImage( QImage * img )
 	if (!img)
 		return NULL;
 
-#if 0	
-	ho_pixbuf * pix = (ho_pixbuf *) malloc (sizeof (ho_pixbuf));
-	pix->height     = img->height();
-	pix->width      = img->width();
-	pix->n_channels = img->depth() / 8;
-	pix->rowstride  = img->bytesPerLine();
-	//pix->data       = img->bits(); // implicit shared - RTFM
-#else
 	ho_pixbuf * pix = ho_pixbuf_new( img->depth()/8, 
 		img->width(), 
 		img->height(), 
@@ -154,7 +169,6 @@ void * QHOCRThread::getPixbufFromQImage( QImage * img )
 			ho_pixbuf_set( pix, x, y, 1, color.green() );
 			ho_pixbuf_set( pix, x, y, 2, color.blue() );
 		}
-#endif	
 	return pix;
 }
 
