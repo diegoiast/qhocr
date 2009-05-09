@@ -132,14 +132,29 @@ void * QHOCRThread::getPixbufFromQImage( QImage * img )
 {
 	if (!img)
 		return NULL;
-	
+
+#if 0	
 	ho_pixbuf * pix = (ho_pixbuf *) malloc (sizeof (ho_pixbuf));
 	pix->height     = img->height();
 	pix->width      = img->width();
 	pix->n_channels = img->depth() / 8;
 	pix->rowstride  = img->bytesPerLine();
-	pix->data       = img->bits(); // implicit shared - RTFM
-	
+	//pix->data       = img->bits(); // implicit shared - RTFM
+#else
+	ho_pixbuf * pix = ho_pixbuf_new( img->depth()/8, 
+		img->width(), 
+		img->height(), 
+		img->bytesPerLine()
+	);
+	for (int x=0; x<pix->width; x++)
+		for(int y=0;y<pix->height; y++)
+		{
+			QColor color = img->pixel( x, y );
+			ho_pixbuf_set( pix, x, y, 0, color.red() );
+			ho_pixbuf_set( pix, x, y, 1, color.green() );
+			ho_pixbuf_set( pix, x, y, 2, color.blue() );
+		}
+#endif	
 	return pix;
 }
 
