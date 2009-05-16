@@ -14,17 +14,6 @@ class QString;
 class QDialog;
 class QScrollArea;
 
-class HOCRThread: public QThread
-{
-public:
-	HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  );
-	virtual void run();
-	
-private:
-	hocr_pixbuf *pix;
-	hocr_text_buffer *text;
-};
-
 class MainWindow: public QMainWindow, public Ui::qhocrMainWindow 
 {
 	Q_OBJECT
@@ -55,12 +44,11 @@ private:
 	void viewImage( QString fileName );
 	bool saveHTML( QString fileName, QString text );
 	bool saveText( QString fileName, QString text, bool unicode );
-	PixmapViewer *imageLabel;
-	QScrollArea  *scrollArea;
+	PixmapViewer	*imageViewer;
+	QScrollArea	*scrollArea;
+	QString		imageFilename;
+	QImage		imageToOCR;
 
-	QImage       savedImage;
-	QImage       scannedImage;
-	QString      imageFilename;
 	QDialog      optionsDialog;
 	Ui::OptionsDialog ui;
 	
@@ -68,15 +56,7 @@ private:
 	QString saveMessage;
 	QHash<QString,QString> extByMessage;
 	
-	// hocr options - hocr_ocr_type
-	bool hocr_ocr_type_nikud;
-	bool hocr_output_with_graphics;
-	int  hocr_brightness;
-
 	int hocr_timer;
-	HOCRThread *hocr_thread;
-	hocr_pixbuf *hocr_pix;
-	hocr_text_buffer *hocr_text;
 };
 
 #endif //__MAIN_WINDOW_H__

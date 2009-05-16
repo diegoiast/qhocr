@@ -1,28 +1,60 @@
-TMP_DIR +=   .tmp
-UI_DIR +=   .tmp
-MOC_DIR +=   .tmp
-OBJECTS_DIR +=   .tmp
-TEMPLATE =   app
-CONFIG +=   qt \
-  release
-DESTDIR +=   bin
-TARGET =   qhocr
+TEMPLATE	=   app
+TARGET		=   qhocr
+CONFIG		+=   qt release
+DESTDIR		+=   bin
+
+TMP_DIR		+=   .tmp
+UI_DIR		+=   .tmp
+MOC_DIR		+=   .tmp
+OBJECTS_DIR	+=   .tmp
+
+INCLUDEPATH +=   src src/libhocr-0.10.16/src
+
 RESOURCES +=   qhocr.qrc
-INCLUDEPATH +=   src \
-  src/hocr
-SOURCES +=   src/hocr/font_layout.c \
-  src/hocr/font_recognition.c \
-  src/hocr/hocr.c \
-  src/hocr/hocr_object.c \
-  src/hocr/hocr_pixbuf.c \
-  src/hocr/hocr_textbuffer.c \
-  src/hocr/page_layout.c \
-  src/main.cpp \
-  src/mainwindow.cpp \
-  src/pixmapviewer.cpp \
-  src/logger.cpp
-FORMS +=   src/hocr_options.ui \
-  src/qhocr_mainwin.ui
-HEADERS +=   src/mainwindow.h \
-  src/pixmapviewer.h \
-  src/logger.h
+
+FORMS +=   src/hocr_options.ui src/qhocr_mainwin.ui
+
+SOURCES +=    \
+	src/libhocr-0.10.16/src/hocr.c \
+	src/libhocr-0.10.16/src/ho_array.c \
+	src/libhocr-0.10.16/src/ho_array_hist.c \
+	src/libhocr-0.10.16/src/ho_array_stat.c \
+	src/libhocr-0.10.16/src/ho_bitmap.c \
+	src/libhocr-0.10.16/src/ho_bitmap_hist.c \
+	src/libhocr-0.10.16/src/ho_dimentions.c \
+	src/libhocr-0.10.16/src/ho_font.c \
+	src/libhocr-0.10.16/src/ho_layout.c \
+	src/libhocr-0.10.16/src/ho_linguistics.c \
+	src/libhocr-0.10.16/src/ho_objmap.c \
+	src/libhocr-0.10.16/src/ho_pixbuf.c \
+	src/libhocr-0.10.16/src/ho_recognize.c \
+	src/libhocr-0.10.16/src/ho_recognize_nikud.c \
+	src/libhocr-0.10.16/src/ho_segment.c \
+	src/libhocr-0.10.16/src/ho_string.c \
+	src/libhocr-0.10.16/src/fonts/ho_recognize_font_1.c \
+	src/libhocr-0.10.16/src/fonts/ho_recognize_font_2.c \
+	src/libhocr-0.10.16/src/fonts/ho_recognize_font_3.c \
+	src/libhocr-0.10.16/src/fonts/ho_recognize_font_4.c \
+	src/libhocr-0.10.16/src/fonts/ho_recognize_font_5.c \
+	src/libhocr-0.10.16/src/fonts/ho_recognize_font_6.c \
+	src/qhocrthread.cpp \
+	src/mainwindow.cpp \
+	src/pixmapviewer.cpp \
+	src/logger.cpp \
+	src/main.cpp
+
+HEADERS +=   \
+	src/qhocrthread.h \
+	src/mainwindow.h \
+	src/pixmapviewer.h \
+	src/logger.h
+
+# Make hocr happy
+DEFINES += PACKAGE_NAME=\\\"qhocr\\\" \
+    PACKAGE_TARNAME=\\\"qhocr\\\" \
+    PACKAGE_VERSION=\\\"0.10.16\\\" \
+    PACKAGE_STRING=\\\"qhocr_0.10.16\\\" \
+    PACKAGE_BUGREPORT=\\\"Diego_Iastrubni_\<diegoiast\@gmail.com\>\\\" \
+    PACKAGE=\\\"libhocr\\\" \
+    VERSION=\\\"0.10.16\\\" \
+    BUILD=\\\"qt4\\\"

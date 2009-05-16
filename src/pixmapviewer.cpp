@@ -8,9 +8,9 @@ PixmapViewer::PixmapViewer():QWidget()
 	setBackgroundRole(QPalette::Dark);
 //	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 // 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	zoomFactor = 1;
-	bestFit = true;
-	userImage = QImage();
+	m_zoomFactor = 1;
+	m_bestFit = true;
+	m_userImage = QImage();
 }
 
 PixmapViewer::PixmapViewer( QWidget *parent ):QWidget(parent)
@@ -18,8 +18,8 @@ PixmapViewer::PixmapViewer( QWidget *parent ):QWidget(parent)
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
  	//setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	bestFit = true;
-	zoomFactor = 1;
+	m_bestFit = true;
+	m_zoomFactor = 1;
 }
 
 PixmapViewer::~PixmapViewer()
@@ -28,25 +28,25 @@ PixmapViewer::~PixmapViewer()
 
 void PixmapViewer::loadImage( QString f )
 {
-	userImage = QImage( f );
+	m_userImage = QImage( f );
 	zoomBy( 1 );
 }
 
 void PixmapViewer::setPixmap( QPixmap p )
 {
-	userImage = p.toImage();
+	m_userImage = p.toImage();
 	zoomBy( 1 );
 }
 
 void PixmapViewer::setImage( QImage i )
 {
-	userImage = i;
+	m_userImage = i;
 	zoomBy( 1 );
 }
 
 void PixmapViewer::wheelEvent ( QWheelEvent *e )
 {
-	if (bestFit)
+	if (m_bestFit)
 		return;
 
 	if (e->delta()>0)
@@ -57,15 +57,16 @@ void PixmapViewer::wheelEvent ( QWheelEvent *e )
 
 void PixmapViewer::paintEvent ( QPaintEvent *event )
 {
-	if (userImage.isNull())
+	Q_UNUSED(event);
+	if (m_userImage.isNull())
 	{
 		return;
 	}
 
 	QPainter p( this );
 	int xoffset, yoffset;
-	int sizeX = displayPixmap.width(); // of image...
-	int sizeY = displayPixmap.height();
+	int sizeX = m_displayPixmap.width(); // of image...
+	int sizeY = m_displayPixmap.height();
 	
 	if (width()  > sizeX)
 		xoffset =  (width()  - sizeX) /2;
@@ -77,7 +78,7 @@ void PixmapViewer::paintEvent ( QPaintEvent *event )
 	else
 		yoffset = 0;
 
-	p.drawPixmap( xoffset, yoffset, displayPixmap );
+	p.drawPixmap( xoffset, yoffset, m_displayPixmap );
 
 
 	if (yoffset || xoffset != 0)
@@ -89,7 +90,8 @@ void PixmapViewer::paintEvent ( QPaintEvent *event )
 
 void PixmapViewer::resizeEvent( QResizeEvent * event )
 {
-	if ((!bestFit) || userImage.isNull())
+	Q_UNUSED(event);
+	if ((!m_bestFit) || m_userImage.isNull())
 		return;
 
 	zoomBy( 1 );
@@ -97,39 +99,39 @@ void PixmapViewer::resizeEvent( QResizeEvent * event )
 
 void PixmapViewer::zoomBy( float f )
 {
-	if (userImage.isNull())
+	if (m_userImage.isNull())
 		return;
 
 	// sanity checks
-	if (zoomFactor*f>4.0)
+	if (m_zoomFactor*f>4.0)
 		return;
 
 	// 0 is treated as rest zoom
-	if ((f!=0.0) && (zoomFactor*f<0.25))
+	if ((f!=0.0) && (m_zoomFactor*f<0.25))
 		return;
 
-	zoomFactor *= f;
-	if (zoomFactor == 0)
-		zoomFactor = 1;
+	m_zoomFactor *= f;
+	if (m_zoomFactor == 0)
+		m_zoomFactor = 1;
 
-	if (bestFit)
+	if (m_bestFit)
 		// Qt is still too slow, when it will be faster, I will 
 		// revert the zoom to smooth, meanwhile I will keep it at fast
-		displayPixmap = QPixmap::fromImage( userImage.scaled( size(), Qt::KeepAspectRatio) );
+		m_displayPixmap = QPixmap::fromImage( m_userImage.scaled( size(), Qt::KeepAspectRatio) );
 	else
-		displayPixmap = QPixmap::fromImage(
-			userImage.scaled( userImage.size() * zoomFactor,
+		m_displayPixmap = QPixmap::fromImage(
+			m_userImage.scaled( m_userImage.size() * m_zoomFactor,
 					Qt::KeepAspectRatioByExpanding,
 					Qt::SmoothTransformation
 			)
 		);
 	
-	if (!bestFit)
+	if (!m_bestFit)
 	{
-		setMinimumSize( displayPixmap.width(), displayPixmap.height() );
-		QWidget *pp = dynamic_cast<QWidget*>( parent() );
-		if (pp)
-			resize( pp->width(), pp->height() );
+		setMinimumSize( m_displayPixmap.width(), m_displayPixmap.height() );
+		QWidget *p = dynamic_cast<QWidget*>( parent() );
+		if (p)
+			resize( p->width(), p->height() );
 	}
 	
 	repaint();
@@ -137,12 +139,12 @@ void PixmapViewer::zoomBy( float f )
 
 void PixmapViewer::setBestFit( bool a )
 {
-	bestFit = a;
+	m_bestFit = a;
 	if (a)
 	{
-		QWidget *pp = dynamic_cast<QWidget*>( parent() );
+		QWidget *p = dynamic_cast<QWidget*>( parent() );
 		setMinimumSize( 32, 32 );
-		resize( pp->size() );
+		resize( p->size() );
 // 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	}
 // 	else
@@ -151,4 +153,4 @@ void PixmapViewer::setBestFit( bool a )
 		//setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
 	zoomBy(1);
-};
+}

@@ -17,28 +17,18 @@
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
 
-#define TITLE "QHOCR 0.8.2-svn"
+#define TITLE "QHOCR 0.10.16-svn"
 #define MESSAGE_TIME 5000
 
-HOCRThread::HOCRThread( hocr_pixbuf *p,  hocr_text_buffer *t  )
-{
-	pix = p;
-	text = t;
-}
-
-void HOCRThread::run()
-{
-	hocr_do_ocr (pix, text);
-}
 
 MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 {
 	setupUi( this );
 	connect( actionAboutQt   , SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-	imageLabel = new PixmapViewer;
+	imageViewer = new PixmapViewer;
 	scrollArea = new QScrollArea;
 	scrollArea->setBackgroundRole(QPalette::Dark);
-	scrollArea->setWidget(imageLabel);
+	scrollArea->setWidget(imageViewer);
 	scrollArea->setWidgetResizable( true );
 //	scrollArea->setLayoutDirection( Qt::RightToLeft );
 	setCentralWidget(scrollArea);
@@ -48,17 +38,10 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	// non-modal options dialog
 	ui.setupUi(&optionsDialog);
 	connect(ui.btnTextFont, SIGNAL(clicked()), this, SLOT(_on_changeFont_clicked()) );
-	connect(ui.applyButton, SIGNAL(clicked()), this, SLOT(apply_hocr_settings()));
-
-	// set default options for viewing images
-	hocr_pix = NULL;
-	hocr_ocr_type_nikud = true;
-	hocr_output_with_graphics = false;
-	hocr_brightness = 100;
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(apply_hocr_settings()));
 
 	setWindowTitle( TITLE );
 	hocr_timer = 0;
-	hocr_thread = NULL;
 	loadStatus();
 
 	// I don't really like this code, but I have no other alternative, read:
@@ -172,17 +155,17 @@ void MainWindow::on_action_Save_triggered()
 
 void MainWindow::on_actionZoomIn_triggered()
 {
-	imageLabel->zoomBy( 1.1 );
+	imageViewer->zoomBy( 1.1 );
 }
 
 void MainWindow::on_actionZoomOut_triggered()
 {
-	imageLabel->zoomBy( 1 / 1.1 );
+	imageViewer->zoomBy( 1 / 1.1 );
 }
 
 void MainWindow::on_actionZoomNormal_triggered()
 {
-	imageLabel->zoomBy( 0 );
+	imageViewer->zoomBy( 0 );
 }
 
 void MainWindow::_on_changeFont_clicked()
@@ -202,8 +185,8 @@ void MainWindow::_on_changeFont_clicked()
 
 void MainWindow::on_actionBestFit_triggered()
 {
-	bool b = imageLabel->getBestFit();
-	imageLabel->setBestFit( !b );
+	bool b = imageViewer->getBestFit();
+	imageViewer->setBestFit( !b );
 
 	actionZoomNormal->setEnabled( b );
 	actionZoomIn->setEnabled( b );
@@ -213,10 +196,7 @@ void MainWindow::on_actionBestFit_triggered()
 
 void MainWindow::on_actionHOCR_Preferences_triggered()
 {
-	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
-	ui.cbGraphics->setChecked(hocr_output_with_graphics);
-
-	ui.sliderBrightness->setValue(hocr_brightness);
+//	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
 
 	if (optionsDialog.isHidden())
 		optionsDialog.show();
@@ -226,10 +206,8 @@ void MainWindow::on_actionHOCR_Preferences_triggered()
 
 void MainWindow::apply_hocr_settings()
 {
-	hocr_ocr_type_nikud		= ui.cbNikud->isChecked();
-	hocr_output_with_graphics	= ui.cbGraphics->isChecked();
-	hocr_brightness			= ui.sliderBrightness->value();
-	scannedText->setFont( ui.textFontPreview->font() );
+//	hocr_ocr_type_nikud		= ui.cbNikud->isChecked();
+//	scannedText->setFont( ui.textFontPreview->font() );
 	scannedText->clear();
 	
 	QTimer::singleShot( 0, this, SLOT(doOCR()));
@@ -240,14 +218,14 @@ void MainWindow::saveStatus()
 	QSettings settings;
 	settings.setValue( "main/image"		, imageFilename );
 	settings.setValue( "main/size"		, size() );
-	settings.setValue( "main/zoom"		, imageLabel->getZoomFactor() );
-	settings.setValue( "main/bestfit"	, imageLabel->getBestFit() );
+	settings.setValue( "main/zoom"		, imageViewer->getZoomFactor() );
+	settings.setValue( "main/bestfit"	, imageViewer->getBestFit() );
 	settings.setValue( "main/position"	, pos() );
 	settings.setValue( "main/state"		, saveState(0) );
 	settings.setValue( "main/font"		, scannedText->font().toString() );
-	settings.setValue( "hocr-type/nikud"	, hocr_ocr_type_nikud );
-	settings.setValue( "hocr-output/graphics", hocr_output_with_graphics );
-	settings.setValue( "hocr/brightness"	, hocr_brightness );
+//	settings.setValue( "hocr-type/nikud"	, hocr_ocr_type_nikud );
+//	settings.setValue( "hocr-output/graphics", hocr_output_with_graphics );
+//	settings.setValue( "hocr/brightness"	, hocr_brightness );
 	
 	settings.sync();
 }
@@ -261,19 +239,18 @@ void MainWindow::loadStatus()
 	restoreState( settings.value("main/state").toByteArray() );
 	scannedText->setFont( QFont(settings.value("main/font").toString()) );
 
-	hocr_ocr_type_nikud         = settings.value( "hocr-type/nikud", true  ).toBool();
-	hocr_output_with_graphics   = settings.value( "hocr-output/graphics", false ).toBool();
-	hocr_brightness             = settings.value( "hocr/brightness", 100).toInt();
+//	hocr_ocr_type_nikud         = settings.value( "hocr-type/nikud", true  ).toBool();
+//	hocr_output_with_graphics   = settings.value( "hocr-output/graphics", false ).toBool();
+//	hocr_brightness             = settings.value( "hocr/brightness", 100).toInt();
 
 	bool bestFit = settings.value("main/bestfit", true).toBool();
 	actionBestFit->setChecked( bestFit );
 	actionZoomIn ->setEnabled( !bestFit );
 	actionZoomOut->setEnabled( !bestFit );
 	actionZoomNormal->setEnabled( !bestFit );
-	imageLabel->setBestFit( bestFit );
-	imageLabel->setZoomFactor( settings.value("main/zoom", "1").toDouble() );
-		
-	viewImage( settings.value( "main/image" ).toString() );
+	imageViewer->setBestFit( bestFit );
+	imageViewer->setZoomFactor( settings.value("main/zoom", "1").toDouble() );
+	imageViewer->loadImage( settings.value( "main/image" ).toString() );
 
 	QString fontName = settings.value("main/font").toString();
 	if (fontName.isEmpty())
@@ -297,6 +274,7 @@ void MainWindow::viewImage( QString fileName )
 	if (fileName.isEmpty())
 		return;
 
+#if 0
 	if (hocr_thread !=NULL)
 	{
 		hocr_thread->quit();
@@ -309,15 +287,16 @@ void MainWindow::viewImage( QString fileName )
 		hocr_pixbuf_unref( hocr_pix );
 		hocr_text_buffer_unref( hocr_text );
 	}
-
+#endif
+	imageFilename = fileName;
+	imageToOCR.load( fileName );
+	imageViewer->setImage( imageToOCR );
 	if (hocr_timer != 0)
 	{
 		killTimer(hocr_timer);
 		hocr_timer = 0;
 	}
-	
-	savedImage.load( fileName );
-	QTimer::singleShot( 0, this, SLOT(doOCR()));
+//	QTimer::singleShot( 0, this, SLOT(doOCR()));
 	
 	setWindowTitle( QString(TITLE) + " - " + fileName );
 	imageFilename = fileName;
@@ -370,62 +349,12 @@ bool MainWindow::saveText( QString fileName, QString text, bool unicode )
 
 void MainWindow::doOCR()
 {
-	hocr_pix = hocr_pixbuf_new();
-	hocr_text = hocr_text_buffer_new();
-	
-	scannedImage = savedImage;
-	imageLabel->setImage( scannedImage );
-		
-	hocr_pix->command = 0;
-	hocr_pix->command |= HOCR_COMMAND_OCR;
-	hocr_pix->command |= HOCR_COMMAND_DICT;
-	
-	if (hocr_ocr_type_nikud)
-		hocr_pix->command |= HOCR_COMMAND_NIKUD;
-	
-	if (hocr_output_with_graphics)
-	{
-		hocr_pix->command |= HOCR_COMMAND_COLOR_BOXES;
-		hocr_pix->command |= HOCR_COMMAND_COLOR_MISREAD;
-	}
-
-	hocr_pix->n_channels	= scannedImage.depth() / 8;
-	hocr_pix->height	= scannedImage.size().height();
-	hocr_pix->width		= scannedImage.size().width();
-	hocr_pix->rowstride	= scannedImage.bytesPerLine();
-	hocr_pix->pixels	= scannedImage.bits();
-	hocr_pix->brightness    = hocr_brightness;
-
-#if 1
-//	this code calls the hocr functions in a separated thread.
-//	another timer is executed every 50 milli-seconds, and will
-//	update the GUI with the status of the text recognition.
-//	
-//	that timer, will query the thread and if it stopped (the call to
-//	hocr_do_ocr() has ended) the thread object will be deleted.
-	scannedText->clear();
-	hocr_thread = new HOCRThread( hocr_pix, hocr_text );
-	hocr_thread->start();
-	hocr_timer = startTimer( 50 );
-#else
-//	this code calls the hocr code in a synchronous mode. this will
-//	block the execution of the main thread, and will make the GUI
-//	non responsive for several seconds. 
-//	it's not used now, but it's left as reference
-	statusBar()->showMessage( tr("Processing image started...") );
-	hocr_do_ocr (hocr_pix, hocr_text);
-	imageLabel->setImage( scannedImage );
-	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
-	hocr_pix->pixels = NULL;
-	hocr_pixbuf_unref( hocr_pix );
-	hocr_text_buffer_unref( hocr_text );
-	hocr_pix = NULL;
-	statusBar()->showMessage( tr("Processing image done"), MESSAGE_TIME );
-#endif
+	// TODO use the new class
 }
 
 void MainWindow::timerEvent(QTimerEvent *)
 {
+#if 0
 	if (hocr_pix == NULL)
 		return;
 
@@ -449,4 +378,5 @@ void MainWindow::timerEvent(QTimerEvent *)
 		delete hocr_thread;
 		hocr_thread = NULL;
 	}
+#endif
 }
