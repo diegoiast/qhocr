@@ -51,7 +51,6 @@ ho_segment_paragraphs_fine (const ho_bitmap * m, const unsigned char box,
   ho_bitmap *m_clean;
   ho_bitmap *m_temp1;
   ho_bitmap *m_out;
-  int x, y;
 
   /* take only "regular" fonts */
   m_clean = ho_bitmap_filter_by_size (m,
@@ -306,13 +305,9 @@ ho_segment_words_fine (const ho_bitmap * m, const ho_bitmap * m_line_map,
   ho_bitmap *m_temp;
   ho_bitmap *m_out;
 
-  int i;
   int x, y;
-  int width;
-  int height;
   int line_height;
   int font_spacing;
-  unsigned char nikud_ret;
 
   /* check for extreem font spacing */
   if (m->font_spacing == 0)
@@ -430,8 +425,6 @@ ho_bitmap *
 ho_segment_fonts (const ho_bitmap * m, const ho_bitmap * m_line_map,
   const unsigned char slicing_threshold, const unsigned char slicing_width)
 {
-  int return_val;
-
   ho_bitmap *m_temp;
   ho_bitmap *m_font;
   ho_bitmap *m_font_temp;
@@ -440,12 +433,9 @@ ho_segment_fonts (const ho_bitmap * m, const ho_bitmap * m_line_map,
 
   int i;
   int x, y;
-  int width;
-  int height;
   int line_height;
   int s_threshold;
   int s_width;
-  unsigned char nikud_ret;
   int *line_fill;
   int avg_line_fill = 0;
   

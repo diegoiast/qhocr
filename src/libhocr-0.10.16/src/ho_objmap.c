@@ -38,6 +38,7 @@
 #endif
 
 #include "ho_objmap.h"
+#include "ho_dimentions.h"
 
 ho_objlist *
 ho_objlist_new ()
@@ -660,8 +661,7 @@ ho_objmap_new_from_bitmap (const ho_bitmap * bit_in)
   double sum;
   double neigbors[4];
   int min;
-  int index, indexes[4];
-  int *map = NULL;
+  int indexes[4];
 
   /* allocate memory */
   m_new = ho_objmap_new (bit_in->width, bit_in->height);
@@ -745,7 +745,6 @@ ho_objmap_font_metrix (const ho_objmap * m, const int min_height,
   const int min_width,
   const int max_width, int *height, int *width, unsigned char *nikud)
 {
-  int i, j;
   int counter;
   double weight_avg;
   double weight_com;

@@ -865,7 +865,7 @@ ho_array_median_filter (const ho_array * ar)
 ho_array *
 ho_array_max_filter (const ho_array * ar)
 {
-  int i, j, x, y;
+  int i, x, y;
 
   double max;
 
@@ -928,7 +928,7 @@ ho_array_max_filter (const ho_array * ar)
 ho_array *
 ho_array_min_filter (const ho_array * ar)
 {
-  int i, j, x, y;
+  int i, x, y;
 
   double min;
 
