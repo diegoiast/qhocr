@@ -4,17 +4,29 @@
 #include "qhocrthread.h"
 #include "hocr.h"
 
-// memcopy
-#include <stdio.h>
-
-
-QHOCRThread::QHOCRThread( QString fileName )
+QHOCRThread::QHOCRThread()
 {
-	mImage.load( fileName );
-	mFileName    = fileName;
-	
-	mHOCR_progress = 0;
-	mStage         = HOCR_STAGES::idle;
+	setDefaultSettings();
+}
+
+QHOCRThread::QHOCRThread( QImage i )
+{
+	setDefaultSettings();
+	setImage( i );
+}
+
+QHOCRThread::QHOCRThread( QString f )
+{
+	setDefaultSettings();
+	loadFile( f );
+}
+
+void QHOCRThread::setDefaultSettings()
+{
+	mFileName.clear();
+	mImage		= QImage();
+	mHOCR_progress	= 0;
+	mStage		= HOCR_STAGES::idle;
 	
 	mHOCR_image_options.scale		= 0;
 	mHOCR_image_options.no_auto_scale	= 0;
@@ -37,30 +49,48 @@ QHOCRThread::QHOCRThread( QString fileName )
 	mHOCR_font_options.do_linguistics	= 0;
 }
 
-// CHANGE THIS TO 0 to use the other version
-#if 1
-// not working, the returned text is not recognized, I see only "*"
-void QHOCRThread::run() 
+void QHOCRThread::setImage( QImage i )
+{
+	mImage = i;
+	mFileName.clear();
+}
+
+void QHOCRThread::loadFile( QString f )
+{
+	mImage.load(f);
+	mFileName = f;
+}
+
+void QHOCRThread::doOCR() 
 {
 	if (mStage != HOCR_STAGES::idle){
 		// this means another thread is running....
 		return;
 	}
 	
-	//mHOCR_progress = 0;
+	mHOCR_progress = 0;
 	mParsedText.clear();
+	
+	// Since we run in a thread, there is an option that the user
+	// will modify the configuration, we still need to use the same
+	// configuration. We copy the member's configuration locally
+	// on this thread.
+	HOCR_IMAGE_OPTIONS  _HOCR_image_options  = mHOCR_image_options;
+	HOCR_LAYOUT_OPTIONS _HOCR_layout_options = mHOCR_layout_options;
+	HOCR_FONT_OPTIONS   _HOCR_font_options   = mHOCR_font_options;
 	
 	// phase 1 - image pre-processing
 	mStage	= HOCR_STAGES::imagePreProces;
+	emit stageChanged(mStage);
 	ho_pixbuf *pixbuf  = (ho_pixbuf*)getPixbufFromQImage( &mImage );
 	ho_bitmap *bitmap = hocr_image_processing( pixbuf,
-		mHOCR_image_options.scale,
-		mHOCR_image_options.no_auto_scale,
-		mHOCR_image_options.rotate,
-		mHOCR_image_options.no_auto_rotate,
-		mHOCR_image_options.adaptive,
-		mHOCR_image_options.threshold,
-		mHOCR_image_options.a_threshold,
+		_HOCR_image_options.scale,
+		_HOCR_image_options.no_auto_scale,
+		_HOCR_image_options.rotate,
+		_HOCR_image_options.no_auto_rotate,
+		_HOCR_image_options.adaptive,
+		_HOCR_image_options.threshold,
+		_HOCR_image_options.a_threshold,
 		&mHOCR_progress
 	);
 	if (!bitmap){
@@ -71,12 +101,13 @@ void QHOCRThread::run()
 	
 	// phase 2 - layout analysis
 	mStage	= HOCR_STAGES::layoutAnalysis;
+	emit stageChanged(mStage);
 	ho_layout *page = hocr_layout_analysis ( bitmap,
-		mHOCR_layout_options.font_spacing_code,
-		mHOCR_layout_options.paragraph_setup,
-		mHOCR_layout_options.slicing_threshold,
-		mHOCR_layout_options.slicing_width,
-		mHOCR_layout_options.dir_ltr,
+		_HOCR_layout_options.font_spacing_code,
+		_HOCR_layout_options.paragraph_setup,
+		_HOCR_layout_options.slicing_threshold,
+		_HOCR_layout_options.slicing_width,
+		_HOCR_layout_options.dir_ltr,
 		&mHOCR_progress
 	);
 	if (!page){
@@ -88,13 +119,14 @@ void QHOCRThread::run()
 	
 	// phase 3 - font recognition
 	mStage	= HOCR_STAGES::fontRecognition;
+	emit stageChanged(mStage);
 	ho_string *text = ho_string_new();
 	int return_val = hocr_font_recognition( page, 
 		text,
-		mHOCR_font_options.html, 
-		mHOCR_font_options.font_code, 
-		mHOCR_font_options.nikud, 
-		mHOCR_font_options.do_linguistics, 
+		_HOCR_font_options.html, 
+		_HOCR_font_options.font_code, 
+		_HOCR_font_options.nikud, 
+		_HOCR_font_options.do_linguistics, 
 		&mHOCR_progress
 	);
 	
@@ -110,45 +142,10 @@ void QHOCRThread::run()
 	ho_string_free(text);
 	exit(return_val);
 }
-#else
-// working, but no control
+
 void QHOCRThread::run()
 {
-	mStage	= HOCR_STAGES::fontRecognition;
-	
-	// note how ugly C is, as I could not forward declard ho_pixbuf and
-	// had to use a typecast...
-	ho_string *mHOCR_text    = (ho_string *)ho_string_new();
-	ho_pixbuf *mHOCR_pixbuf  = (ho_pixbuf*) getPixbufFromQImage( &mImage );
-	
-	// this will take a long time...
-	hocr_do_ocr( (ho_pixbuf*) mHOCR_pixbuf,		// pix_in
-		     (ho_string*) mHOCR_text,		// s_text_out
-		     1,					// html
-		     0,					// font_code
-		     0,					// do_linguistics
-		     &mHOCR_progress 
-	);
-
-	qDebug("ocr ended at [%d]%%", mHOCR_progress);
-	
-	mParsedText  = QString::fromUtf8( 
-		((ho_string*) (mHOCR_text))->string, 
-		((ho_string*) (mHOCR_text))->size
-	);
-	free(mHOCR_text);
-	free(mHOCR_pixbuf);
-	mHOCR_text   = NULL;
-	mHOCR_pixbuf = NULL;
-	mStage	= HOCR_STAGES::idle;
-	
-	quit();
-}
-#endif
-
-void QHOCRThread::doOCR()
-{
-	this->start();
+	doOCR();
 }
 
 void * QHOCRThread::getPixbufFromQImage( QImage * img )

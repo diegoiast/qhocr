@@ -44,13 +44,19 @@ namespace HOCR_STAGES {
 class QHOCRThread : public QThread{
 	Q_OBJECT
 public:
-
+	QHOCRThread();
+	QHOCRThread( QImage );
 	QHOCRThread( QString );
-	virtual void run();
-	
+
+	void setDefaultSettings();
+	void setImage( QImage  );
+	void loadFile( QString );
 	void doOCR();
-	void* getPixbufFromQImage( QImage * );
-	
+
+// this will do the OCR in a separate thread
+	virtual void run();
+
+// inline functions, used to retrive internal structrure
 	int getProcess(){ 
 		return mHOCR_progress; 
 	}
@@ -67,14 +73,20 @@ public:
 		QThread::usleep(i);
 	}
 
+// set as public - read only when you call doOCR()
 	HOCR_IMAGE_OPTIONS  mHOCR_image_options;
 	HOCR_LAYOUT_OPTIONS mHOCR_layout_options;
 	HOCR_FONT_OPTIONS   mHOCR_font_options;
+
+signals:
+	void stageChanged(HOCR_STAGES::stageNames newStage);
 	
 private:
+	void* getPixbufFromQImage( QImage * );
+	
 	QString mParsedText;
 	QString mFileName;
-	QImage mImage;
+	QImage  mImage;
 	
 	HOCR_STAGES::stageNames mStage;
 	int mHOCR_progress; // process is inside each stage
