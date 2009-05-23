@@ -4,19 +4,26 @@
 #include <QDebug>
 #include "qhocrthread.h"
 
+#include "hocr.h"
+#include "ho_pixbuf.h"
+
 int main( int argc, char *argv[] )
 {
 	QCoreApplication app(argc,argv);
 	QHOCRThread hocr;
 	
+	QImage img;
+	img.load("/home/elcuco/src/qhocr/tests/test6.jpg");
+//	img.load("/home/elcuco/src/qhocr/tests/bible-01-small_print.jpg");
+	
 	hocr.loadFile("/home/elcuco/src/qhocr/tests/test6.jpg");
 //	hcor.loadFile("/home/elcuco/src/qhocr/tests/bible-01-small_print.jpg");
+	QTime timer;
 	
+#if 0
 	// this will run the OCR function in a separate thread
 	hocr.start();
-	
 	const int MAX_TIME = 60*7; // in seconds
-	QTime timer;
 	timer.start();
 	while (hocr.isRunning())
 	{
@@ -30,6 +37,9 @@ int main( int argc, char *argv[] )
 			break;
 		}
 	}
+#else
+	hocr.doOCR();
+#endif
 	
 	qDebug() << "Memory used: " << getMemSize() << "kb";
 	qDebug() << "Process took:" << timer.elapsed() << " Found string:" << hocr.getString() ;

@@ -5,6 +5,7 @@
 #include <QHash>
 
 #include "hocr.h"
+#include "qhocrthread.h"
 #include "pixmapviewer.h"
 #include "ui_hocr_options.h"
 #include "ui_qhocr_mainwin.h"
@@ -38,6 +39,9 @@ public slots:
 	void closeEvent(QCloseEvent *);
 	
 	void doOCR();
+	void ocrEnded();
+	void OCR_changedState(HOCR_STAGES::stageNames newStage);
+	
 	virtual void timerEvent(QTimerEvent *);
 
 private:
@@ -57,6 +61,7 @@ private:
 	QHash<QString,QString> extByMessage;
 	
 	int hocr_timer;
+	QHOCRThread *qhocrThread;
 };
 
 #endif //__MAIN_WINDOW_H__

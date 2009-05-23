@@ -12,7 +12,6 @@
 #include <QThread>
 #include <QTimer>
 #include <QDir>
-//#include <QFileInfo >
 
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
@@ -32,6 +31,8 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	scrollArea->setWidgetResizable( true );
 //	scrollArea->setLayoutDirection( Qt::RightToLeft );
 	setCentralWidget(scrollArea);
+	
+	scannedText->setLayoutDirection( Qt::RightToLeft );
 
 	statusBar()->showMessage( tr("Welcome - load an image to start"), MESSAGE_TIME );
 
@@ -43,6 +44,8 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	setWindowTitle( TITLE );
 	hocr_timer = 0;
 	loadStatus();
+	
+	qhocrThread = NULL;
 
 	// I don't really like this code, but I have no other alternative, read:
 	// http://www.qtcentre.org/forum/f-qt-programming-2/t-qfiledialoggetsavefilename-default-extension-8503.html
@@ -62,13 +65,13 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 void MainWindow::on_actionAbout_triggered()
 {
 	QMessageBox::information( 0,
-		tr("About QHOCR 0.8.2"), 
+		tr("About QHOCR 0.10.16"), 
 		tr("QHOCR - a Qt4 GUI front end to the HOCR library"
-		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006"
+		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006,2009"
 		"<br><br>This application is free software, released under the terms of GPL"
 		"read LICENSE.GPL for more intormation. Newer versions can be found at"
 		" <a href='http://code.google.com/p/qhocr/'>http://code.google.com/p/qhocr/</a> <br>"
-		"<br>This application uses <b>libhocr 0.8.2</b> by "
+		"<br>This application uses <b>libhocr 0.10.16</b> by "
 		"Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
 		"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>")
 	);
@@ -243,15 +246,6 @@ void MainWindow::loadStatus()
 //	hocr_output_with_graphics   = settings.value( "hocr-output/graphics", false ).toBool();
 //	hocr_brightness             = settings.value( "hocr/brightness", 100).toInt();
 
-	bool bestFit = settings.value("main/bestfit", true).toBool();
-	actionBestFit->setChecked( bestFit );
-	actionZoomIn ->setEnabled( !bestFit );
-	actionZoomOut->setEnabled( !bestFit );
-	actionZoomNormal->setEnabled( !bestFit );
-	imageViewer->setBestFit( bestFit );
-	imageViewer->setZoomFactor( settings.value("main/zoom", "1").toDouble() );
-	imageViewer->loadImage( settings.value( "main/image" ).toString() );
-
 	QString fontName = settings.value("main/font").toString();
 	if (fontName.isEmpty())
 		fontName = ui.textFontPreview->font().toString();
@@ -261,6 +255,16 @@ void MainWindow::loadStatus()
 	ui.textFontPreview->setFont( font );
 	ui.textFontPreview->setText( font.family() );
 	scannedText->setFont( font );
+
+	bool bestFit = settings.value("main/bestfit", true).toBool();
+	actionBestFit->setChecked( bestFit );
+	actionZoomIn ->setEnabled( !bestFit );
+	actionZoomOut->setEnabled( !bestFit );
+	actionZoomNormal->setEnabled( !bestFit );
+	imageViewer->setBestFit( bestFit );
+	imageViewer->setZoomFactor( settings.value("main/zoom", "1").toDouble() );
+	//imageViewer->loadImage( settings.value( "main/image" ).toString() );
+	viewImage( settings.value( "main/image" ).toString() );
 }
 
 void MainWindow::closeEvent(QCloseEvent *)
@@ -273,30 +277,11 @@ void MainWindow::viewImage( QString fileName )
 {
 	if (fileName.isEmpty())
 		return;
-
-#if 0
-	if (hocr_thread !=NULL)
-	{
-		hocr_thread->quit();
-		while(hocr_thread->isRunning());
-		delete hocr_thread;
-		hocr_thread = NULL;
-		
-		scannedText->clear();
-		hocr_pix->pixels = NULL;
-		hocr_pixbuf_unref( hocr_pix );
-		hocr_text_buffer_unref( hocr_text );
-	}
-#endif
+	
 	imageFilename = fileName;
 	imageToOCR.load( fileName );
 	imageViewer->setImage( imageToOCR );
-	if (hocr_timer != 0)
-	{
-		killTimer(hocr_timer);
-		hocr_timer = 0;
-	}
-//	QTimer::singleShot( 0, this, SLOT(doOCR()));
+	QTimer::singleShot( 0, this, SLOT(doOCR()));
 	
 	setWindowTitle( QString(TITLE) + " - " + fileName );
 	imageFilename = fileName;
@@ -349,34 +334,91 @@ bool MainWindow::saveText( QString fileName, QString text, bool unicode )
 
 void MainWindow::doOCR()
 {
-	// TODO use the new class
+	if (hocr_timer != 0)
+	{
+		killTimer(hocr_timer);
+		hocr_timer = 0;
+	}
+	
+	hocr_timer = startTimer( 50 );
+	if (!qhocrThread){
+		qhocrThread = new QHOCRThread;
+		connect( qhocrThread, SIGNAL(finished()), this, SLOT(ocrEnded()) );
+		connect( qhocrThread, SIGNAL(stageChanged(HOCR_STAGES::stageNames)), this, SLOT(OCR_changedState(HOCR_STAGES::stageNames)));
+	}
+	
+	if (qhocrThread->isRunning())
+		return;
+	
+	qhocrThread->setImage( imageToOCR );
+	qhocrThread->start();
+	
+	scannedText->clear();
+}
+
+void MainWindow::ocrEnded()
+{
+	if (!qhocrThread)
+		return;
+	
+//	scannedText->setPlainText( qhocrThread->getString() );
+	scannedText->setHtml(
+		QString("<div dir='rtl' style='text-align:left' >%1</div>").arg(qhocrThread->getString()) 
+	);
+	
+	delete qhocrThread;
+	qhocrThread = NULL;
+	
+	statusBar()->showMessage( tr("OCR ended"), MESSAGE_TIME );
+}
+
+void MainWindow::OCR_changedState(HOCR_STAGES::stageNames newStage)
+{
+	switch (newStage)
+	{
+		case HOCR_STAGES::idle:
+			// phase 0 - doing nothing
+			break;
+
+		case HOCR_STAGES::imagePreProces:
+			// phase 1 - image pre-processing
+			break;
+
+		case HOCR_STAGES::layoutAnalysis:
+			// phase 2 - layout analysis
+			break;
+
+		case HOCR_STAGES::fontRecognition:
+			// phase 3 - font recognition
+			break;
+	}
 }
 
 void MainWindow::timerEvent(QTimerEvent *)
 {
-#if 0
-	if (hocr_pix == NULL)
+	if (!qhocrThread)
 		return;
-
-	int percentage = (int)(100*(hocr_pix->progress+2)/256.);
-	statusBar()->showMessage( tr("Processing image: %1%").arg(percentage), MESSAGE_TIME );
-	scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
-
-	if (hocr_thread->isFinished())
+	
+	int percentage = qhocrThread->getProcess();
+	switch (qhocrThread->getStage())
 	{
-		imageLabel->setImage( scannedImage );
-
-		scannedText->setPlainText( QString::fromUtf8(hocr_text->text) );
-		hocr_pix->pixels = NULL;
-		hocr_pixbuf_unref( hocr_pix );
-		hocr_text_buffer_unref( hocr_text );
-		hocr_pix = NULL;
-		statusBar()->showMessage( tr("Processing image done"), MESSAGE_TIME );
-
-		killTimer( hocr_timer );
-		hocr_timer = 0;
-		delete hocr_thread;
-		hocr_thread = NULL;
+		case HOCR_STAGES::idle:
+			// phase 0 - doing nothing
+			break;
+			
+		case HOCR_STAGES::imagePreProces:
+			// phase 1 - image pre-processing
+			statusBar()->showMessage( tr("Processing image: %1% - 1/3").arg(percentage), MESSAGE_TIME );
+			break;
+			
+		case HOCR_STAGES::layoutAnalysis:
+			// phase 2 - layout analysis
+			statusBar()->showMessage( tr("Layout analysis: %1% - 2/3").arg(percentage), MESSAGE_TIME );
+			break;
+			
+		case HOCR_STAGES::fontRecognition:
+			// phase 3 - font recognition
+			statusBar()->showMessage( tr("Font recognition: %1% - 3/3").arg(percentage), MESSAGE_TIME );
+			break;
 	}
-#endif
 }

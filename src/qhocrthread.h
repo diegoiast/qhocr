@@ -78,11 +78,11 @@ public:
 	HOCR_LAYOUT_OPTIONS mHOCR_layout_options;
 	HOCR_FONT_OPTIONS   mHOCR_font_options;
 
+	void* getPixbufFromQImage( QImage * );
 signals:
 	void stageChanged(HOCR_STAGES::stageNames newStage);
 	
 private:
-	void* getPixbufFromQImage( QImage * );
 	
 	QString mParsedText;
 	QString mFileName;
