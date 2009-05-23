@@ -153,13 +153,14 @@ void * QHOCRThread::getPixbufFromQImage( QImage * img )
 	if (!img)
 		return NULL;
 
-	ho_pixbuf * pix = ho_pixbuf_new( img->depth()/8, 
+	ho_pixbuf * pix = ho_pixbuf_new( 
+		3,			// img->depth()/8, 
 		img->width(), 
 		img->height(), 
-		img->bytesPerLine()
+		0			// img->bytesPerLine()
 	);
-	for (int x=0; x<pix->width; x++)
-		for(int y=0;y<pix->height; y++)
+	for (int x=0; x < pix->width; x++)
+		for(int y=0; y < pix->height; y++)
 		{
 			QColor color = img->pixel( x, y );
 			ho_pixbuf_set( pix, x, y, 0, color.red() );
