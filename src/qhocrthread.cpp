@@ -1,6 +1,7 @@
 #include <QRgb>
 #include <QColor>
 
+#include <cstdio>
 #include "qhocrthread.h"
 #include "hocr.h"
 
