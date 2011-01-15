@@ -41,6 +41,7 @@ void QHOCRThread::setDefaultSettings()
 	mHOCR_layout_options.paragraph_setup	= 0;
 	mHOCR_layout_options.slicing_threshold	= 0;
 	mHOCR_layout_options.slicing_width	= 0;
+	mHOCR_layout_options.line_leeway        = 0;
 	mHOCR_layout_options.dir_ltr		= 0;
 	mHOCR_layout_options.html		= 1;
 
@@ -108,6 +109,7 @@ void QHOCRThread::doOCR()
 		_HOCR_layout_options.paragraph_setup,
 		_HOCR_layout_options.slicing_threshold,
 		_HOCR_layout_options.slicing_width,
+		_HOCR_layout_options.line_leeway,
 		_HOCR_layout_options.dir_ltr,
 		&mHOCR_progress
 	);

@@ -16,7 +16,8 @@
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
 
-#define TITLE "QHOCR 0.10.16-svn"
+#define STRING_STR "0.11-rc1"
+#define TITLE "QHOCR " STRING_STR
 #define MESSAGE_TIME 5000
 
 
@@ -65,15 +66,15 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 void MainWindow::on_actionAbout_triggered()
 {
 	QMessageBox::information( 0,
-		tr("About QHOCR 0.10.16"), 
-		tr("QHOCR - a Qt4 GUI front end to the HOCR library"
-		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006,2009"
+		tr("About QHOCR %1").arg(STRING_STR),
+		tr("QHOCR - a Qt4 GUI front end to the hebOCR library"
+		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006,2009,2011"
 		"<br><br>This application is free software, released under the terms of GPL"
 		"read LICENSE.GPL for more intormation. Newer versions can be found at"
 		" <a href='http://code.google.com/p/qhocr/'>http://code.google.com/p/qhocr/</a> <br>"
-		"<br>This application uses <b>libhocr 0.10.16</b> by "
-		"Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
-		"which can be found at <a href='http://hocr.berlios.de'>http://hocr.berlios.de</a>")
+		"<br>This application uses <b>hebOCR %1</b> originally by "
+		"Dr. Kobi Zamir &lt;<a href='kzamir@walla.co.il'>kzamir@walla.co.il</a>&gt;, "
+		"which can be found at <a href='http://code.google.com/p/hebocr/'>http://code.google.com/p/hebocr/</a>").arg(STRING_STR)
 	);
 }
 

@@ -1,3 +1,9 @@
+qhocr (0.11)
+  * Moved to the new 0.11.... version of hocr
+  * Dumping libhocr, and instead use hebOCR
+  * Moved to mercurial
+  -- Diego Iastrubni <diegoiast@gmail.com>	Sat, 15 Jan 2011 17:00
+
 qhocr (0.8.2)
   * New HOCR library (official release 0.8.2, with a nimor change)
   * HOCR can handle tables, nikud, more stable ... 

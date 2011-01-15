@@ -19,6 +19,7 @@ typedef struct HOCR_LAYOUT_OPTIONS {
 	int paragraph_setup;
 	int slicing_threshold;
 	int slicing_width;
+	int line_leeway;
 	unsigned char dir_ltr;
 	unsigned char html;
 } HOCR_OPTIONS;
