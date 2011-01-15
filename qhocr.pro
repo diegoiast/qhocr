@@ -7,6 +7,7 @@ TMP_DIR		+=   .tmp
 UI_DIR		+=   .tmp
 MOC_DIR		+=   .tmp
 OBJECTS_DIR	+=   .tmp
+VERSION = 0.11
 
 INCLUDEPATH +=   src src/hebocr/src
 
@@ -49,15 +50,28 @@ HEADERS +=   \
 	src/pixmapviewer.h \
 	src/logger.h
 
-# Make hocr happy
+# Make hebocr happy
 DEFINES += PACKAGE_NAME=\\\"qhocr\\\" \
     PACKAGE_TARNAME=\\\"qhocr\\\" \
-    PACKAGE_VERSION=\\\"0.10.16\\\" \
-    PACKAGE_STRING=\\\"qhocr_0.10.16\\\" \
+    PACKAGE_VERSION=\\\"0.11\\\" \
+    PACKAGE_STRING=\\\"qhocr0.11\\\" \
     PACKAGE_BUGREPORT=\\\"Diego_Iastrubni_\<diegoiast\@gmail.com\>\\\" \
     PACKAGE=\\\"libhocr\\\" \
-    VERSION=\\\"0.10.16\\\" \
+    VERSION=\\\"0.11\\\" \
     BUILD=\\\"qt4\\\"
 
 OTHER_FILES += \
-    src/hebocr/auto-conf.sh
+    INSTALL \
+    COPYING.gpl \
+    COPYING.bsd \
+    AUTHORS \
+    COPYING \
+    ChangeLog \
+    src/images/zoomout.png \
+    src/images/zoomin.png \
+    src/images/save.png \
+    src/images/paste.png \
+    src/images/open.png \
+    src/images/new.png \
+    src/images/cut.png \
+    src/images/copy.png
