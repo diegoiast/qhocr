@@ -4,6 +4,8 @@
 #include <QThread>
 #include <QImage>
 
+#include "hocr.h"
+
 typedef struct HOCR_IMAGE_OPTIONS{
 	unsigned char scale;
 	unsigned char no_auto_scale;
@@ -75,9 +77,9 @@ public:
 	}
 
 // set as public - read only when you call doOCR()
-	HOCR_IMAGE_OPTIONS  mHOCR_image_options;
-	HOCR_LAYOUT_OPTIONS mHOCR_layout_options;
-	HOCR_FONT_OPTIONS   mHOCR_font_options;
+	HEBOCR_IMAGE_OPTIONS mHOCR_image_options;
+	HOCR_LAYOUT_OPTIONS  mHOCR_layout_options;
+	HOCR_FONT_OPTIONS    mHOCR_font_options;
 
 	void* getPixbufFromQImage( QImage * );
 signals:

@@ -77,22 +77,16 @@ void QHOCRThread::doOCR()
 	// will modify the configuration, we still need to use the same
 	// configuration. We copy the member's configuration locally
 	// on this thread.
-	HOCR_IMAGE_OPTIONS  _HOCR_image_options  = mHOCR_image_options;
-	HOCR_LAYOUT_OPTIONS _HOCR_layout_options = mHOCR_layout_options;
-	HOCR_FONT_OPTIONS   _HOCR_font_options   = mHOCR_font_options;
+	HEBOCR_IMAGE_OPTIONS _HOCR_image_options  = mHOCR_image_options;
+	HOCR_LAYOUT_OPTIONS _HOCR_layout_options  = mHOCR_layout_options;
+	HOCR_FONT_OPTIONS   _HOCR_font_options    = mHOCR_font_options;
 	
 	// phase 1 - image pre-processing
 	mStage	= HOCR_STAGES::imagePreProces;
 	emit stageChanged(mStage);
 	ho_pixbuf *pixbuf  = (ho_pixbuf*)getPixbufFromQImage( &mImage );
 	ho_bitmap *bitmap = hocr_image_processing( pixbuf,
-		_HOCR_image_options.scale,
-		_HOCR_image_options.no_auto_scale,
-		_HOCR_image_options.rotate,
-		_HOCR_image_options.no_auto_rotate,
-		_HOCR_image_options.adaptive,
-		_HOCR_image_options.threshold,
-		_HOCR_image_options.a_threshold,
+		&_HOCR_image_options,
 		&mHOCR_progress
 	);
 	if (!bitmap){

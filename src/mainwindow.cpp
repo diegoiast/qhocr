@@ -16,7 +16,7 @@
 #include "mainwindow.h"
 #include "ui_hocr_options.h"
 
-#define STRING_STR "0.11-rc1"
+#define STRING_STR "0.11"
 #define TITLE "QHOCR " STRING_STR
 #define MESSAGE_TIME 5000
 
@@ -201,11 +201,12 @@ void MainWindow::on_actionBestFit_triggered()
 void MainWindow::on_actionHOCR_Preferences_triggered()
 {
 //	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
-
+/*
 	if (optionsDialog.isHidden())
 		optionsDialog.show();
 	else
 		optionsDialog.hide();
+*/
 }
 
 void MainWindow::apply_hocr_settings()

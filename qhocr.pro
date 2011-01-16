@@ -34,10 +34,6 @@ SOURCES +=    \
 	src/hebocr/src/ho_string.c \
 	src/hebocr/src/fonts/ho_recognize_font_1.c \
 	src/hebocr/src/fonts/ho_recognize_font_2.c \
-	src/hebocr/src/fonts/ho_recognize_font_3.c \
-	src/hebocr/src/fonts/ho_recognize_font_4.c \
-	src/hebocr/src/fonts/ho_recognize_font_5.c \
-	src/hebocr/src/fonts/ho_recognize_font_6.c \
 	src/qhocrthread.cpp \
 	src/mainwindow.cpp \
 	src/pixmapviewer.cpp \
@@ -48,16 +44,17 @@ HEADERS +=   \
 	src/qhocrthread.h \
 	src/mainwindow.h \
 	src/pixmapviewer.h \
-	src/logger.h
+	src/logger.h \
+    src/hebocr/src/hebocr_globals.h
 
 # Make hebocr happy
 DEFINES += PACKAGE_NAME=\\\"qhocr\\\" \
     PACKAGE_TARNAME=\\\"qhocr\\\" \
-    PACKAGE_VERSION=\\\"0.11\\\" \
-    PACKAGE_STRING=\\\"qhocr0.11\\\" \
+    PACKAGE_VERSION=\\\"0.12\\\" \
+    PACKAGE_STRING=\\\"qhocr_0.12\\\" \
     PACKAGE_BUGREPORT=\\\"Diego_Iastrubni_\<diegoiast\@gmail.com\>\\\" \
     PACKAGE=\\\"libhocr\\\" \
-    VERSION=\\\"0.11\\\" \
+    VERSION=\\\"0.12\\\" \
     BUILD=\\\"qt4\\\"
 
 OTHER_FILES += \
