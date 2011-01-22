@@ -45,17 +45,8 @@ HEADERS +=   \
 	src/mainwindow.h \
 	src/pixmapviewer.h \
 	src/logger.h \
-    src/hebocr/src/hebocr_globals.h
+	src/hebocr/src/hebocr_globals.h
 
-# Make hebocr happy
-DEFINES += PACKAGE_NAME=\\\"qhocr\\\" \
-    PACKAGE_TARNAME=\\\"qhocr\\\" \
-    PACKAGE_VERSION=\\\"0.12\\\" \
-    PACKAGE_STRING=\\\"qhocr_0.12\\\" \
-    PACKAGE_BUGREPORT=\\\"Diego_Iastrubni_\<diegoiast\@gmail.com\>\\\" \
-    PACKAGE=\\\"libhocr\\\" \
-    VERSION=\\\"0.12\\\" \
-    BUILD=\\\"qt4\\\"
 
 OTHER_FILES += \
     INSTALL \
