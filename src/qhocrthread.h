@@ -6,16 +6,6 @@
 
 #include "hocr.h"
 
-typedef struct HOCR_IMAGE_OPTIONS{
-	unsigned char scale;
-	unsigned char no_auto_scale;
-	double rotate;
-	unsigned char no_auto_rotate;
-	unsigned char adaptive;
-	unsigned char threshold;
-	unsigned char a_threshold;
-} HOCR_IMAGE_OPTIONS;
-
 typedef struct HOCR_LAYOUT_OPTIONS {
 	int font_spacing_code;
 	int paragraph_setup;
