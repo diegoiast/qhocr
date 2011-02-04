@@ -77,16 +77,16 @@ void QHOCRThread::doOCR()
 	// will modify the configuration, we still need to use the same
 	// configuration. We copy the member's configuration locally
 	// on this thread.
-	HEBOCR_IMAGE_OPTIONS _HOCR_image_options  = mHOCR_image_options;
-	HOCR_LAYOUT_OPTIONS _HOCR_layout_options  = mHOCR_layout_options;
-	HOCR_FONT_OPTIONS   _HOCR_font_options    = mHOCR_font_options;
+	HEBOCR_IMAGE_OPTIONS  image_options   = mHOCR_image_options;
+	HEBOCR_LAYOUT_OPTIONS layout_options  = mHOCR_layout_options;
+	HOCR_FONT_OPTIONS     font_options    = mHOCR_font_options;
 	
 	// phase 1 - image pre-processing
 	mStage	= HOCR_STAGES::imagePreProces;
 	emit stageChanged(mStage);
 	ho_pixbuf *pixbuf  = (ho_pixbuf*)getPixbufFromQImage( &mImage );
 	ho_bitmap *bitmap = hocr_image_processing( pixbuf,
-		&_HOCR_image_options,
+		&image_options,
 		&mHOCR_progress
 	);
 	if (!bitmap){
@@ -98,15 +98,7 @@ void QHOCRThread::doOCR()
 	// phase 2 - layout analysis
 	mStage	= HOCR_STAGES::layoutAnalysis;
 	emit stageChanged(mStage);
-	ho_layout *page = hocr_layout_analysis ( bitmap,
-		_HOCR_layout_options.font_spacing_code,
-		_HOCR_layout_options.paragraph_setup,
-		_HOCR_layout_options.slicing_threshold,
-		_HOCR_layout_options.slicing_width,
-		_HOCR_layout_options.line_leeway,
-		_HOCR_layout_options.dir_ltr,
-		&mHOCR_progress
-	);
+	ho_layout *page = hocr_layout_analysis ( bitmap, layout_options, &mHOCR_progress );
 	if (!page){
 		// could not do layout anlysis
 		ho_pixbuf_free(pixbuf);
@@ -120,10 +112,10 @@ void QHOCRThread::doOCR()
 	ho_string *text = ho_string_new();
 	int return_val = hocr_font_recognition( page, 
 		text,
-		_HOCR_font_options.html, 
-		_HOCR_font_options.font_code, 
-		_HOCR_font_options.nikud, 
-		_HOCR_font_options.do_linguistics, 
+		  font_options.html, 
+		  font_options.font_code, 
+		  font_options.nikud, 
+		  font_options.do_linguistics, 
 		&mHOCR_progress
 	);
 	
