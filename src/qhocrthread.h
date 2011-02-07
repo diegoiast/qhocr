@@ -57,9 +57,9 @@ public:
 	}
 
 // set as public - read only when you call doOCR()
-	HEBOCR_IMAGE_OPTIONS mHOCR_image_options;
-	HEBOCR_LAYOUT_OPTIONS  mHOCR_layout_options;
-	HOCR_FONT_OPTIONS    mHOCR_font_options;
+	HEBOCR_IMAGE_OPTIONS  mHOCR_image_options;
+	HEBOCR_LAYOUT_OPTIONS mHOCR_layout_options;
+	HEBOCR_FONT_OPTIONS   mHOCR_font_options;
 
 	void* getPixbufFromQImage( QImage * );
 signals:

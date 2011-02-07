@@ -46,7 +46,6 @@ void QHOCRThread::setDefaultSettings()
 	mHOCR_layout_options.html		= 1;
 
 	mHOCR_font_options.font_code		= 0;
-	mHOCR_font_options.html			= 1;
 	mHOCR_font_options.nikud		= 1;
 	mHOCR_font_options.do_linguistics	= 0;
 }
@@ -79,7 +78,7 @@ void QHOCRThread::doOCR()
 	// on this thread.
 	HEBOCR_IMAGE_OPTIONS  image_options   = mHOCR_image_options;
 	HEBOCR_LAYOUT_OPTIONS layout_options  = mHOCR_layout_options;
-	HOCR_FONT_OPTIONS     font_options    = mHOCR_font_options;
+	HEBOCR_FONT_OPTIONS   font_options    = mHOCR_font_options;
 	
 	// phase 1 - image pre-processing
 	mStage	= HOCR_STAGES::imagePreProces;
@@ -110,14 +109,7 @@ void QHOCRThread::doOCR()
 	mStage	= HOCR_STAGES::fontRecognition;
 	emit stageChanged(mStage);
 	ho_string *text = ho_string_new();
-	int return_val = hocr_font_recognition( page, 
-		text,
-		  font_options.html, 
-		  font_options.font_code, 
-		  font_options.nikud, 
-		  font_options.do_linguistics, 
-		&mHOCR_progress
-	);
+	int return_val = hocr_font_recognition( page, text, &font_options, 1, &mHOCR_progress );
 	
 	mParsedText  = QString::fromUtf8( 
 		((ho_string*) (text))->string, 

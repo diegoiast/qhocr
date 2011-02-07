@@ -45,7 +45,8 @@ HEADERS +=   \
 	src/mainwindow.h \
 	src/pixmapviewer.h \
 	src/logger.h \
-	src/hebocr/src/hebocr_globals.h
+	src/hebocr/src/hebocr_globals.h \
+    src/hebocr/src/hocr.h
 
 
 OTHER_FILES += \
