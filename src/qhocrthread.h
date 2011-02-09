@@ -3,15 +3,7 @@
 
 #include <QThread>
 #include <QImage>
-
 #include "hocr.h"
-
-typedef struct HOCR_FONT_OPTIONS {
-	int font_code;
-	unsigned char html;
-	unsigned char nikud;
-	unsigned char do_linguistics;
-} HOCR_FONT_OPTIONS;
 
 
 // just because it's cool. Any better way of doing this?

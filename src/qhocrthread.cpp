@@ -30,9 +30,9 @@ void QHOCRThread::setDefaultSettings()
 	mStage		= HOCR_STAGES::idle;
 	
 	mHOCR_image_options.scale		= 0;
-	mHOCR_image_options.no_auto_scale	= 0;
-	mHOCR_image_options.rotate		= 0x00;
-	mHOCR_image_options.no_auto_rotate	= 0;
+	mHOCR_image_options.auto_scale		= 1;
+	mHOCR_image_options.rotation_angle	= 0;
+	mHOCR_image_options.auto_rotate		= 1;
 	mHOCR_image_options.adaptive		= 0;
 	mHOCR_image_options.threshold		= 0;
 	mHOCR_image_options.a_threshold		= 0;
@@ -97,7 +97,7 @@ void QHOCRThread::doOCR()
 	// phase 2 - layout analysis
 	mStage	= HOCR_STAGES::layoutAnalysis;
 	emit stageChanged(mStage);
-	ho_layout *page = hocr_layout_analysis ( bitmap, layout_options, &mHOCR_progress );
+	ho_layout *page = hocr_layout_analysis ( bitmap, &layout_options, &mHOCR_progress );
 	if (!page){
 		// could not do layout anlysis
 		ho_pixbuf_free(pixbuf);
@@ -129,12 +129,12 @@ void QHOCRThread::run()
 	doOCR();
 }
 
-void * QHOCRThread::getPixbufFromQImage( QImage * img )
+void* QHOCRThread::getPixbufFromQImage( QImage * img )
 {
 	if (!img)
 		return NULL;
 
-	ho_pixbuf * pix = ho_pixbuf_new( 
+	ho_pixbuf* pix = ho_pixbuf_new(
 		3,			// img->depth()/8, 
 		img->width(), 
 		img->height(), 

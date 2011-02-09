@@ -46,7 +46,23 @@ HEADERS +=   \
 	src/pixmapviewer.h \
 	src/logger.h \
 	src/hebocr/src/hebocr_globals.h \
-    src/hebocr/src/hocr.h
+    src/hebocr/src/hocr.h \
+    src/hebocr/src/ho_pixbuf.h \
+    src/hebocr/src/hocrpp.h \
+    src/hebocr/src/ho_array.h \
+    src/hebocr/src/ho_bitmap.h \
+    src/hebocr/src/ho_font.h \
+    src/hebocr/src/ho_objmap.h \
+    src/hebocr/src/ho_layout.h \
+    src/hebocr/src/ho_recognize.h \
+    src/hebocr/src/ho_segment.h \
+    src/hebocr/src/ho_array_stat.h \
+    src/hebocr/src/ho_dimentions.h \
+    src/hebocr/src/ho_array_hist.h \
+    src/hebocr/src/ho_bitmap_hist.h \
+    src/hebocr/src/ho_string.h \
+    src/hebocr/src/ho_recognize_nikud.h \
+    src/hebocr/src/ho_linguistics.h
 
 
 OTHER_FILES += \
