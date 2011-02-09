@@ -6,15 +6,15 @@
 #include "hocr.h"
 
 
-// just because it's cool. Any better way of doing this?
-namespace HOCR_STAGES {
-	enum stageNames { 
+class HEBOCRStages {
+public:
+	enum stageNames {
 		idle,		// phase 0 - doing nothing
 		imagePreProces,	// phase 1 - image pre-processing
 		layoutAnalysis,	// phase 2 - layout analysis
 		fontRecognition	// phase 3 - font recognition
 	};
-}
+};
 
 class QHOCRThread : public QThread{
 	Q_OBJECT
@@ -36,7 +36,7 @@ public:
 		return mHOCR_progress; 
 	}
 	
-	HOCR_STAGES::stageNames getStage(){ 
+	HEBOCRStages::stageNames getStage(){
 		return mStage; 
 	}
 	
@@ -55,7 +55,7 @@ public:
 
 	void* getPixbufFromQImage( QImage * );
 signals:
-	void stageChanged(HOCR_STAGES::stageNames newStage);
+	void stageChanged(HEBOCRStages::stageNames newStage);
 	
 private:
 	
@@ -63,9 +63,8 @@ private:
 	QString mFileName;
 	QImage  mImage;
 	
-	HOCR_STAGES::stageNames mStage;
+	HEBOCRStages::stageNames mStage;
 	int mHOCR_progress; // process is inside each stage
-	
 };
 
 

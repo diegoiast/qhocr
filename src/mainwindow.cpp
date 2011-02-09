@@ -374,23 +374,23 @@ void MainWindow::ocrEnded()
 	statusBar()->showMessage( tr("OCR ended"), MESSAGE_TIME );
 }
 
-void MainWindow::OCR_changedState(HOCR_STAGES::stageNames newStage)
+void MainWindow::OCR_changedState(HEBOCRStages::stageNames newStage)
 {
 	switch (newStage)
 	{
-		case HOCR_STAGES::idle:
+		case HEBOCRStages::idle:
 			// phase 0 - doing nothing
 			break;
 
-		case HOCR_STAGES::imagePreProces:
+		case HEBOCRStages::imagePreProces:
 			// phase 1 - image pre-processing
 			break;
 
-		case HOCR_STAGES::layoutAnalysis:
+		case HEBOCRStages::layoutAnalysis:
 			// phase 2 - layout analysis
 			break;
 
-		case HOCR_STAGES::fontRecognition:
+		case HEBOCRStages::fontRecognition:
 			// phase 3 - font recognition
 			break;
 	}
@@ -404,21 +404,21 @@ void MainWindow::timerEvent(QTimerEvent *)
 	int percentage = qhocrThread->getProcess();
 	switch (qhocrThread->getStage())
 	{
-		case HOCR_STAGES::idle:
+		case HEBOCRStages::idle:
 			// phase 0 - doing nothing
 			break;
 			
-		case HOCR_STAGES::imagePreProces:
+		case HEBOCRStages::imagePreProces:
 			// phase 1 - image pre-processing
 			statusBar()->showMessage( tr("Processing image: %1% - 1/3").arg(percentage), MESSAGE_TIME );
 			break;
 			
-		case HOCR_STAGES::layoutAnalysis:
+		case HEBOCRStages::layoutAnalysis:
 			// phase 2 - layout analysis
 			statusBar()->showMessage( tr("Layout analysis: %1% - 2/3").arg(percentage), MESSAGE_TIME );
 			break;
 			
-		case HOCR_STAGES::fontRecognition:
+		case HEBOCRStages::fontRecognition:
 			// phase 3 - font recognition
 			statusBar()->showMessage( tr("Font recognition: %1% - 3/3").arg(percentage), MESSAGE_TIME );
 			break;

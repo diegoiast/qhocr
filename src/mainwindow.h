@@ -40,7 +40,7 @@ public slots:
 	
 	void doOCR();
 	void ocrEnded();
-	void OCR_changedState(HOCR_STAGES::stageNames newStage);
+	void OCR_changedState(HEBOCRStages::stageNames newStage);
 	
 	virtual void timerEvent(QTimerEvent *);
 

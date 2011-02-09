@@ -27,7 +27,7 @@ void QHOCRThread::setDefaultSettings()
 	mFileName.clear();
 	mImage		= QImage();
 	mHOCR_progress	= 0;
-	mStage		= HOCR_STAGES::idle;
+	mStage		= HEBOCRStages::idle;
 	
 	mHOCR_image_options.scale		= 0;
 	mHOCR_image_options.auto_scale		= 1;
@@ -64,7 +64,7 @@ void QHOCRThread::loadFile( QString f )
 
 void QHOCRThread::doOCR() 
 {
-	if (mStage != HOCR_STAGES::idle){
+	if (mStage != HEBOCRStages::idle){
 		// this means another thread is running....
 		return;
 	}
@@ -81,7 +81,7 @@ void QHOCRThread::doOCR()
 	HEBOCR_FONT_OPTIONS   font_options    = mHOCR_font_options;
 	
 	// phase 1 - image pre-processing
-	mStage	= HOCR_STAGES::imagePreProces;
+	mStage	= HEBOCRStages::imagePreProces;
 	emit stageChanged(mStage);
 	ho_pixbuf *pixbuf  = (ho_pixbuf*)getPixbufFromQImage( &mImage );
 	ho_bitmap *bitmap = hocr_image_processing( pixbuf,
@@ -95,7 +95,7 @@ void QHOCRThread::doOCR()
 	}
 	
 	// phase 2 - layout analysis
-	mStage	= HOCR_STAGES::layoutAnalysis;
+	mStage	= HEBOCRStages::layoutAnalysis;
 	emit stageChanged(mStage);
 	ho_layout *page = hocr_layout_analysis ( bitmap, &layout_options, &mHOCR_progress );
 	if (!page){
@@ -106,7 +106,7 @@ void QHOCRThread::doOCR()
 	}
 	
 	// phase 3 - font recognition
-	mStage	= HOCR_STAGES::fontRecognition;
+	mStage	= HEBOCRStages::fontRecognition;
 	emit stageChanged(mStage);
 	ho_string *text = ho_string_new();
 	int return_val = hocr_font_recognition( page, text, &font_options, 1, &mHOCR_progress );
@@ -115,7 +115,7 @@ void QHOCRThread::doOCR()
 		((ho_string*) (text))->string, 
 		((ho_string*) (text))->size
 	);
-	mStage	= HOCR_STAGES::idle;
+	mStage	= HEBOCRStages::idle;
 
 	ho_layout_free(page);
 	ho_pixbuf_free(pixbuf);
