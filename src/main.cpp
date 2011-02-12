@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	QString s = QCoreApplication::applicationDirPath() + "/plugins";
 	app.addLibraryPath( s );
 	
-	QMainWindow *window = new MainWindow;
-	window->show();
+	QMainWindow window;
+	window.show();
 	return app.exec();
 }
