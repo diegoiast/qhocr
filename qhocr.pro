@@ -13,7 +13,9 @@ INCLUDEPATH +=   src src/hebocr/src
 
 RESOURCES +=   qhocr.qrc
 
-FORMS +=   src/hocr_options.ui src/qhocr_mainwin.ui
+FORMS +=   src/hocr_options.ui src/qhocr_mainwin.ui \
+    src/imageoptionscontrol.ui \
+    src/hebocr/src/LayoutOptionsWidget.ui
 
 SOURCES +=    \
 	src/hebocr/src/hocr.c \
@@ -38,7 +40,8 @@ SOURCES +=    \
 	src/mainwindow.cpp \
 	src/pixmapviewer.cpp \
 	src/logger.cpp \
-	src/main.cpp
+	src/main.cpp \
+    src/imageoptionscontrol.cpp
 
 HEADERS +=   \
 	src/qhocrthread.h \
@@ -62,7 +65,8 @@ HEADERS +=   \
     src/hebocr/src/ho_bitmap_hist.h \
     src/hebocr/src/ho_string.h \
     src/hebocr/src/ho_recognize_nikud.h \
-    src/hebocr/src/ho_linguistics.h
+    src/hebocr/src/ho_linguistics.h \
+    src/imageoptionscontrol.h
 
 
 OTHER_FILES += \

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>OptionsDialog</class>
- <widget class="QDialog" name="OptionsDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="OptionsDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,48 +10,48 @@
     <height>301</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>HOCR options</string>
   </property>
-  <property name="sizeGripEnabled" >
+  <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <property name="modal" >
+  <property name="modal">
    <bool>false</bool>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
-      <number>0</number>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="tab_4" >
-      <attribute name="title" >
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
        <string>Display</string>
       </attribute>
-      <layout class="QVBoxLayout" >
+      <layout class="QVBoxLayout">
        <item>
-        <layout class="QHBoxLayout" >
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
+          <widget class="QLabel" name="label_5">
+           <property name="text">
             <string>DIsplay font:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="textFontPreview" >
-           <property name="frameShape" >
+          <widget class="QLabel" name="textFontPreview">
+           <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>TextLabel</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="btnTextFont" >
-           <property name="text" >
+          <widget class="QToolButton" name="btnTextFont">
+           <property name="text">
             <string>...</string>
            </property>
           </widget>
@@ -59,183 +60,115 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
        <string>Image options</string>
       </attribute>
-      <layout class="QVBoxLayout" >
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QCheckBox" name="checkBox_3" >
-           <property name="text" >
-            <string>No Auto Rotate</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" >
-           <item>
-            <widget class="QLabel" name="label" >
-             <property name="text" >
-              <string>Rotate</string>
-             </property>
-             <property name="buddy" >
-              <cstring>doubleSpinBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="doubleSpinBox" />
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QCheckBox" name="checkBox_2" >
-           <property name="text" >
-            <string>No Auto scale</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox" >
-           <property name="text" >
-            <string>Scale</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_4" >
-         <property name="text" >
-          <string>Adaptive</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QCheckBox" name="checkBox_5" >
-           <property name="text" >
-            <string>Threshold</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_6" >
-           <property name="text" >
-            <string>a_threshold</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="ImageOptionsControl" name="widget" native="true"/>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2" >
-      <attribute name="title" >
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
        <string>Layout options</string>
       </attribute>
-      <layout class="QVBoxLayout" >
+      <layout class="QVBoxLayout">
        <item>
-        <widget class="QCheckBox" name="checkBox_7" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_7">
+         <property name="text">
           <string>Font spacing code</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_8" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_8">
+         <property name="text">
           <string>Paragraph setup</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" >
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
+          <widget class="QLabel" name="label_2">
+           <property name="text">
             <string>Slicing threshold</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox" />
+          <widget class="QSpinBox" name="spinBox"/>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" >
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="text" >
+          <widget class="QLabel" name="label_3">
+           <property name="text">
             <string>Slicing width</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_2" />
+          <widget class="QSpinBox" name="spinBox_2"/>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_9" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_9">
+         <property name="text">
           <string>Direction - LTR</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_10" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_10">
+         <property name="text">
           <string>HTML</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3" >
-      <attribute name="title" >
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
        <string>Font optinos</string>
       </attribute>
-      <layout class="QVBoxLayout" >
+      <layout class="QVBoxLayout">
        <item>
-        <layout class="QHBoxLayout" >
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QLabel" name="label_4" >
-           <property name="text" >
+          <widget class="QLabel" name="label_4">
+           <property name="text">
             <string>Font code</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit" />
+          <widget class="QLineEdit" name="lineEdit"/>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_11" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_11">
+         <property name="text">
           <string>HTML</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_12" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_12">
+         <property name="text">
           <string>Nikud</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_13" >
-         <property name="text" >
+        <widget class="QCheckBox" name="checkBox_13">
+         <property name="text">
           <string>Do linguistics</string>
          </property>
         </widget>
@@ -245,14 +178,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageOptionsControl</class>
+   <extends>QWidget</extends>
+   <header>imageoptionscontrol.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

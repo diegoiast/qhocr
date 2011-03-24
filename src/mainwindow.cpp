@@ -30,7 +30,7 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 	scrollArea->setBackgroundRole(QPalette::Dark);
 	scrollArea->setWidget(imageViewer);
 	scrollArea->setWidgetResizable( true );
-//	scrollArea->setLayoutDirection( Qt::RightToLeft );
+	scrollArea->setLayoutDirection( Qt::RightToLeft );
 	setCentralWidget(scrollArea);
 	
 	scannedText->setLayoutDirection( Qt::RightToLeft );
@@ -201,12 +201,11 @@ void MainWindow::on_actionBestFit_triggered()
 void MainWindow::on_actionHOCR_Preferences_triggered()
 {
 //	ui.cbNikud->setChecked(hocr_ocr_type_nikud);
-/*
+
 	if (optionsDialog.isHidden())
 		optionsDialog.show();
 	else
 		optionsDialog.hide();
-*/
 }
 
 void MainWindow::apply_hocr_settings()

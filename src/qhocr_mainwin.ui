@@ -35,7 +35,7 @@
    </property>
    <widget class="QMenu" name="menu_FIle">
     <property name="title">
-     <string>&amp;FIle</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
     <addaction name="action_Save"/>
@@ -101,6 +101,9 @@
    </widget>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
