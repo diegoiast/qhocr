@@ -7,7 +7,8 @@ TMP_DIR		+=   .tmp
 UI_DIR		+=   .tmp
 MOC_DIR		+=   .tmp
 OBJECTS_DIR	+=   .tmp
-VERSION = 0.11
+VERSION = 0.12
+QT += widgets
 
 INCLUDEPATH +=   src src/hebocr/src
 
