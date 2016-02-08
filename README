@@ -1,19 +1,32 @@
 QHOCR is a front end to hebocr originall by Dr. Kobi Zamir.
 
-The GUI compiles and runs on Windows and Linux. It shuold work on Embeded-Linux
- and Mac, and probably any other platform supported by Qt4.
 
-How to help?
-See the README in hocr directory. You can also contact Diego Iastrubni 
-<elcuco@kde.org>.
+The GUI compiles and runs on Windows and Linux. It shuold work on Embeded-Linux
+ and Mac, and probably any other platform supported by Qt5.
 
 I would like to thank Kobi for his great work on the library, and making the 
 intefaces *so* clean, that they could be ported that easily. I aslo thank him 
 for the initial GUIs, from which I ... learned ... and copied... :)
 
-This app uses hebhocr 0.11 staticly.
-You can always get the newest version of qhocr from:
-http://code.google.com/p/qhocr/
+
+How to build:
+
+Clone this directory, and inside it clone Kobi's library. On linux/mac this can
+be done with these lines:
+
+
+	git clone https://github.com/diegoiast/qhocr.git qhocr
+	git clone https://github.com/yaacov/hebocr.git qhocr/hebocr
+
+
+If you are running Windows, please clone qhocr from this repo:
+https://github.com/diegoiast/qhocr.git
+
+and then inside that clone, clone another sub direcory from this repo:
+https://github.com/yaacov/hebocr.git qhocr/hebocr
+
+If you need any help - contact
+Diego Iastrubni diegoiast@gmail.com elcuco@kde.org
 
 - diego
 
