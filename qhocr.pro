@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 SUBDIRS = libhebocr qhocr qhocr-cli
 
 # we don't really use subdir, but sub projects
-libhebocr.file = hebocr/hebocr-lib.pro
+libhebocr.file = src/hebocr-lib.pro
 qhocr.file  = src/qhocr-gui.pro
 qhocr-cli.file  = src/qhocr-cli.pro
 

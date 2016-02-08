@@ -1,7 +1,7 @@
 TARGET = qhocr-cli
 TEMPLATE = 
 QT = core gui
-LIBS += -lhebocr -L../hebocr
+LIBS += -lhebocr -L .
 
 INCLUDEPATH += . ../hebocr/src/
 SOURCES =  \

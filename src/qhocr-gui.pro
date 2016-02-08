@@ -8,7 +8,7 @@ QT += widgets
 INCLUDEPATH +=   . ../hebocr/src/
 
 RESOURCES += ./qhocr.qrc 
-LIBS += -lhebocr -L../hebocr
+LIBS += -lhebocr -L .
 
 FORMS += \
 	hocr_options.ui \
