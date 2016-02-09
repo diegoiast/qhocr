@@ -15,12 +15,18 @@ Clone this directory, and inside it clone Kobi's library. On linux/mac this can
 be done with these lines:
 
 
-	git clone https://github.com/diegoiast/qhocr.git qhocr
+	git clone https://github.com/elcuco/qhocr.git qhocr
 	git clone https://github.com/yaacov/hebocr.git qhocr/hebocr
+	cd qhocr
+	mkdir qbuild
+	cd qbuild
+	qmake (in debian based systems - qmake-qt5)
+	make -j 12
+	LD_LIBRARY_PATH=src/ src/qhocr
 
 
 If you are running Windows, please clone qhocr from this repo:
-https://github.com/diegoiast/qhocr.git
+https://github.com/elcuco/qhocr.git
 
 and then inside that clone, clone another sub direcory from this repo:
 https://github.com/yaacov/hebocr.git qhocr/hebocr
