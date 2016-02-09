@@ -25,16 +25,7 @@ MainWindow::MainWindow( QWidget *parent ):QMainWindow( parent )
 {
 	setupUi( this );
 	connect( actionAboutQt   , SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-	imageViewer = new PixmapViewer;
-	scrollArea = new QScrollArea;
-	scrollArea->setBackgroundRole(QPalette::Dark);
-	scrollArea->setWidget(imageViewer);
-	scrollArea->setWidgetResizable( true );
-	scrollArea->setLayoutDirection( Qt::RightToLeft );
-	setCentralWidget(scrollArea);
-	
 	scannedText->setLayoutDirection( Qt::RightToLeft );
-
 	statusBar()->showMessage( tr("Welcome - load an image to start"), MESSAGE_TIME );
 
 	// non-modal options dialog
@@ -67,7 +58,7 @@ void MainWindow::on_actionAbout_triggered()
 {
 	QMessageBox::information( 0,
 		tr("About QHOCR %1").arg(STRING_STR),
-		tr("QHOCR - a Qt4 GUI front end to the hebOCR library"
+		tr("QHOCR - a Qt5 GUI front end to the hebOCR library"
 		"<br>Diego Iastrubni &lt;<a href='elcuco@kde.org'>elcuco@kde.org</a>&gt; 2005,2006,2009,2011"
 		"<br><br>This application is free software, released under the terms of GPL"
 		"read LICENSE.GPL for more intormation. Newer versions can be found at"

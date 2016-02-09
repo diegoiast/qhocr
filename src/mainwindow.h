@@ -48,8 +48,6 @@ private:
 	void viewImage( QString fileName );
 	bool saveHTML( QString fileName, QString text );
 	bool saveText( QString fileName, QString text, bool unicode );
-	PixmapViewer	*imageViewer;
-	QScrollArea	*scrollArea;
 	QString		imageFilename;
 	QImage		imageToOCR;
 
