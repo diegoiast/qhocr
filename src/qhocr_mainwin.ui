@@ -19,7 +19,16 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
    </layout>
@@ -78,7 +87,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -102,7 +120,7 @@
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="windowTitle">
     <string>toolBar</string>
@@ -120,9 +138,12 @@
    <addaction name="actionZoomOut"/>
   </widget>
   <action name="action_Open">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
-    <iconset resource="../qhocr.qrc">
-     <normaloff>:/src/images/open.png</normaloff>:/src/images/open.png</iconset>
+    <iconset theme="action_open" resource="qhocr.qrc">
+     <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open...</string>
@@ -133,8 +154,8 @@
   </action>
   <action name="action_Save">
    <property name="icon">
-    <iconset resource="../qhocr.qrc">
-     <normaloff>:/src/images/save.png</normaloff>:/src/images/save.png</iconset>
+    <iconset resource="qhocr.qrc">
+     <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save...</string>
@@ -161,8 +182,8 @@
   </action>
   <action name="actionZoomIn">
    <property name="icon">
-    <iconset resource="../qhocr.qrc">
-     <normaloff>:/src/images/zoomin.png</normaloff>:/src/images/zoomin.png</iconset>
+    <iconset resource="qhocr.qrc">
+     <normaloff>:/images/zoomin.png</normaloff>:/images/zoomin.png</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;In</string>
@@ -173,8 +194,8 @@
   </action>
   <action name="actionZoomOut">
    <property name="icon">
-    <iconset resource="../qhocr.qrc">
-     <normaloff>:/src/images/zoomout.png</normaloff>:/src/images/zoomout.png</iconset>
+    <iconset resource="qhocr.qrc">
+     <normaloff>:/images/zoomout.png</normaloff>:/images/zoomout.png</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;Out</string>
@@ -212,7 +233,7 @@
  </widget>
  <layoutdefault spacing="0" margin="0"/>
  <resources>
-  <include location="../qhocr.qrc"/>
+  <include location="qhocr.qrc"/>
  </resources>
  <connections/>
  <designerdata>
